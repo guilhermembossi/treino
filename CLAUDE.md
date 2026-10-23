@@ -55,6 +55,12 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - Testar local: `npm run build` e `npx vite preview --port 4173 --host 127.0.0.1` → http://127.0.0.1:4173/treino/ (use 127.0.0.1, não localhost).
 - Ainda sem service worker (tarefa 3.2) e sem Supabase no app (tarefa 2.2).
 
+## Login (tarefa 1.3, 23/10/2026)
+- Supabase Auth com e-mail e senha, confirmação por e-mail obrigatória, senha mínima de 8, sem anônimo nem outros provedores.
+- Site URL `https://guilhermembossi.github.io/treino/`. Redirect URLs: `https://guilhermembossi.github.io/treino/**` e `http://127.0.0.1:4173/treino/**` (teste local). No app, mandar `emailRedirectTo`/`redirectTo` para o endereço atual dentro dessas.
+- O que dá para conferir sem conta: `GET /auth/v1/settings` com a chave publicável (`external.email`, `disable_signup`, `mailer_autoconfirm`). Site URL e senha mínima só pelo painel ou criando conta.
+- E-mail grátis do Supabase: só para os e-mails da equipe do projeto e com limite por hora. Para outras pessoas, configurar SMTP próprio. Os modelos de e-mail vêm em inglês.
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -67,4 +73,4 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança) e 2.1 (esqueleto e publicação) feitas em 23/10/2026. Próxima: 1.3 (configurar o login, com parada manual), depois 2.2.
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação) e 1.3 (login no painel) feitas em 23/10/2026. Próxima: 2.2 (telas de login), que também confere na prática o Site URL e a senha mínima.
