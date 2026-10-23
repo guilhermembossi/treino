@@ -37,10 +37,17 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - Supabase pelo MCP do Claude Code (sem Supabase CLI).
 - Pasta fora do OneDrive de propósito (dependências do npm).
 
+## Banco (tarefa 1.1, 23/10/2026)
+- Migrações em `supabase/migrations/<versão>_<nome>.sql`, com a mesma versão que aparece no histórico do Supabase. Mudança de banco sempre por migração nova (`apply_migration`), nunca editando uma já aplicada.
+- Tabelas: `fichas`, `ficha_exercicios`, `ficha_series`, `treinos`, `treino_series`. Todas com `id` UUID (gerado no celular), `user_id` (padrão `auth.uid()`), `criado_em` e `atualizado_em`.
+- `atualizado_em` é gravado pelo celular, sem gatilho, porque a sincronização decide pela alteração mais recente.
+- `treinos` guarda `nome_ficha` e `treino_series` guarda `exercicio_nome`: o histórico não depende da ficha. Apagar a ficha deixa `treinos.ficha_id` vazio; apagar ficha ou exercício apaga os filhos.
+- RLS: 4 políticas por tabela (ler, criar, alterar, apagar), só para `authenticated` e só do dono. Nas filhas, criar e alterar também exigem que o pai seja do usuário. O `anon` não tem nenhuma permissão nas tabelas.
+
 ## Pontos de atenção
 - Supabase grátis pausa após 7 dias sem uso.
 - E-mail de confirmação do cadastro precisa apontar para o endereço do app (tarefa 1.3).
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente) e 0.2 (repositório e este arquivo) feitas em 23/10/2026. Próxima: 1.1 (tabelas).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo) e 1.1 (tabelas) feitas em 23/10/2026. Próxima: 1.2 (teste de segurança).
