@@ -146,4 +146,52 @@ button { font: inherit; }
 .rodape-conta { margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--textoFraco); }
 .rodape-conta .link { min-height: 0; padding: 0; }
 
+.topo-acoes { display: flex; align-items: center; gap: 0.25rem; }
+
+/* Indicador de sincronização */
+.sync {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: 0;
+  background: none;
+  color: var(--textoFraco);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.sync-ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--sucesso); flex: none; }
+.sync-pendente .sync-ponto, .sync-sincronizando .sync-ponto { background: transparent; border: 2px solid var(--primaria); }
+.sync-sincronizando .sync-ponto { animation: pulsar 1s ease-in-out infinite; }
+.sync-offline .sync-ponto { background: var(--textoFraco); }
+.sync-erro { color: var(--erro); }
+.sync-erro .sync-ponto { background: var(--erro); }
+@keyframes pulsar { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .sync-sincronizando .sync-ponto { animation: none; } }
+
+/* Fichas (versão simples) */
+.linha-nova { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.linha-nova .botao-primario { width: auto; padding: 0 1.25rem; }
+.lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.item-ficha { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.5rem 0.25rem 0.25rem; }
+.linha-nova input, .item-ficha input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 16px;
+  min-height: 48px;
+  padding: 0 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--texto);
+}
+.linha-nova input { border-color: var(--borda); background: var(--fundo); }
+.item-ficha input { font-weight: 600; }
+.item-ficha input:focus, .linha-nova input:focus { outline: 2px solid var(--primaria); outline-offset: 0; }
+.link.perigo { color: var(--erro); padding: 0 0.5rem; }
+.vazio { text-align: center; padding: 1rem 0; }
+.nota { font-size: 0.8rem; margin-top: 1rem; }
+
 :focus-visible { outline: 2px solid var(--primaria); outline-offset: 2px; }

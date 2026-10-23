@@ -2,6 +2,8 @@ import { useEffect, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { marca } from './config/marca';
 import { useSessao } from './sessao';
+import { ProvedorDados } from './dados/contexto';
+import IndicadorSync from './componentes/IndicadorSync';
 import { IconeFichas, IconeHistorico, IconeInicio } from './icones';
 import Logo from './componentes/Logo';
 import BotaoTema from './componentes/BotaoTema';
@@ -38,13 +40,17 @@ export default function App() {
   const atual = ABAS.find((a) => a.id === aba)!;
 
   return (
+    <ProvedorDados userId={sessao.user.id}>
     <div className="app">
       <header className="topo">
         <div className="marca">
           <Logo tamanho={28} />
           <span>{marca.nome}</span>
         </div>
-        <BotaoTema />
+        <div className="topo-acoes">
+          <IndicadorSync />
+          <BotaoTema />
+        </div>
       </header>
 
       <main className="conteudo">{atual.tela(sessao)}</main>
@@ -58,5 +64,6 @@ export default function App() {
         ))}
       </nav>
     </div>
+    </ProvedorDados>
   );
 }

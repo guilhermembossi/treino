@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vitest run && vite build",
     "preview": "vite preview",
-    "icones": "node scripts/gerar_icones.mjs"
+    "icones": "node scripts/gerar_icones.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.118.0",
+    "idb": "8.0.4",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
@@ -19,8 +21,10 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
+    "fake-indexeddb": "6.2.6",
     "sharp": "0.35.5",
     "typescript": "5.9.3",
-    "vite": "8.3.5"
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
   }
 }

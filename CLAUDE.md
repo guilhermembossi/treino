@@ -72,6 +72,20 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - Sair: link no rodapé do Início (com o e-mail da conta).
 - `componentes/Logo.tsx` e `componentes/BotaoTema.tsx` são usados no topo e no login.
 
+## Dados no celular e sincronização (tarefa 3.1, 24/10/2026)
+- **Tudo passa pela camada `src/dados/`; a tela nunca chama o Supabase direto para dados.** `useDados()` (salvar, excluir, listar, obter), `useLista(tabela)` (lista viva) e `useEstadoSync()`.
+- `dados.ts` (classe `Dados`): IndexedDB (pacote `idb`), um banco por usuário (`treino-dados-<user_id>`), uma loja por tabela + `pendentes` (o que falta enviar) + `meta` (até quando baixou cada tabela).
+  - `salvar` preenche `id` (`crypto.randomUUID`), `user_id`, `criado_em`, `atualizado_em` (relógio do celular) e marca pendente. `excluir` marca `excluido_em` no registro e nos filhos (`FILHOS` em `tipos.ts`); o app nunca apaga de verdade.
+  - Sincronizar: envia por tabela na ordem de `TABELAS` (pais antes dos filhos) com upsert; tira da fila só o que não mudou durante o envio. Lote recusado → tenta um por um (um registro ruim não segura os outros; estado "erro"). Depois baixa por `sincronizado_em` > última vez − 2 min e aplica a mais recente.
+  - Quando: ao abrir, 0,8 s depois de cada gravação, ao voltar a internet, ao voltar para o app e a cada minuto (`contexto.tsx`). Uma rodada por vez.
+  - Sem `code` no erro do Supabase = sem rede (tenta depois, estado "offline").
+- **Banco (migração `20261023235035_sincronizacao`):** `excluido_em` e `sincronizado_em` (hora do servidor, posta pelo gatilho `ao_gravar_sincronizacao`) nas 5 tabelas. O gatilho também ignora, sem erro, uma alteração com `atualizado_em` mais antigo que o gravado (a mais recente vale também no servidor). Função com `search_path` vazio e sem `execute` para os usuários.
+- Indicador no topo (`componentes/IndicadorSync.tsx`): Sincronizado / N pendentes / Sincronizando / Sem internet / Erro; tocar força a sincronização.
+- Fichas (`telas/Fichas.tsx`): versão simples (criar, renomear, excluir) só para testar a sincronização; a completa é a 4.1.
+- Testes: `npm test` (vitest + fake-indexeddb, `src/dados/dados.test.ts`, 10 casos com um servidor falso que segue as regras do Supabase). **O `npm run build` roda os testes**: publicação para se algum falhar. No banco: `testes/teste_sincronizacao.sql` (6 OK).
+- No iPhone o app instalado tem IndexedDB próprio, separado do Safari.
+- Classe com `private` no parâmetro do construtor não compila (`erasableSyntaxOnly`): declarar os campos.
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -84,5 +98,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. Próxima: 3.1 (dados no celular e sincronização).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi publicada em 24/10/2026 e espera o teste do Guilherme em modo avião. Próxima: 3.2 (abrir sem internet).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.
