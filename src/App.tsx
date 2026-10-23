@@ -1,7 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { marca, logoSvg } from './config/marca';
-import { useTema } from './tema';
-import { IconeFichas, IconeHistorico, IconeInicio, IconeLua, IconeSol } from './icones';
+import type { Session } from '@supabase/supabase-js';
+import { marca } from './config/marca';
+import { useSessao } from './sessao';
+import { IconeFichas, IconeHistorico, IconeInicio } from './icones';
+import Logo from './componentes/Logo';
+import BotaoTema from './componentes/BotaoTema';
+import Acesso from './telas/Acesso';
 import Inicio from './telas/Inicio';
 import Historico from './telas/Historico';
 import Fichas from './telas/Fichas';
@@ -9,20 +13,18 @@ import Fichas from './telas/Fichas';
 type Aba = 'inicio' | 'historico' | 'fichas';
 
 // Navegação pelo # do endereço (#/historico): funciona no GitHub Pages e o botão voltar do celular volta de aba.
-const ABAS: { id: Aba; rota: string; nome: string; icone: () => ReactNode; tela: () => ReactNode }[] = [
-  { id: 'inicio', rota: '#/', nome: 'Início', icone: IconeInicio, tela: Inicio },
-  { id: 'historico', rota: '#/historico', nome: 'Histórico', icone: IconeHistorico, tela: Historico },
-  { id: 'fichas', rota: '#/fichas', nome: 'Fichas', icone: IconeFichas, tela: Fichas },
+const ABAS: { id: Aba; rota: string; nome: string; icone: () => ReactNode; tela: (s: Session) => ReactNode }[] = [
+  { id: 'inicio', rota: '#/', nome: 'Início', icone: IconeInicio, tela: (s) => <Inicio sessao={s} /> },
+  { id: 'historico', rota: '#/historico', nome: 'Histórico', icone: IconeHistorico, tela: () => <Historico /> },
+  { id: 'fichas', rota: '#/fichas', nome: 'Fichas', icone: IconeFichas, tela: () => <Fichas /> },
 ];
 
 const abaDoEndereco = (): Aba =>
   ABAS.find((a) => a.rota === location.hash && a.id !== 'inicio')?.id ?? 'inicio';
 
-const logo = `data:image/svg+xml,${encodeURIComponent(logoSvg(marca.icone.fundo, marca.icone.desenho))}`;
-
 export default function App() {
+  const { carregando, sessao, recuperacao, fimDaRecuperacao } = useSessao();
   const [aba, setAba] = useState<Aba>(abaDoEndereco);
-  const { tema, alternar } = useTema();
 
   useEffect(() => {
     const aoMudar = () => setAba(abaDoEndereco());
@@ -30,22 +32,22 @@ export default function App() {
     return () => window.removeEventListener('hashchange', aoMudar);
   }, []);
 
+  if (carregando) return <div className="carregando" aria-busy="true"><Logo tamanho={64} /></div>;
+  if (!sessao || recuperacao) return <Acesso novaSenha={recuperacao} aoTrocarSenha={fimDaRecuperacao} />;
+
   const atual = ABAS.find((a) => a.id === aba)!;
-  const rotuloTema = tema === 'escuro' ? 'Mudar para tema claro' : 'Mudar para tema escuro';
 
   return (
     <div className="app">
       <header className="topo">
         <div className="marca">
-          <img src={logo} alt="" width={28} height={28} />
+          <Logo tamanho={28} />
           <span>{marca.nome}</span>
         </div>
-        <button className="botao-icone" onClick={alternar} aria-label={rotuloTema} title={rotuloTema}>
-          {tema === 'escuro' ? <IconeSol /> : <IconeLua />}
-        </button>
+        <BotaoTema />
       </header>
 
-      <main className="conteudo">{atual.tela()}</main>
+      <main className="conteudo">{atual.tela(sessao)}</main>
 
       <nav className="barra" aria-label="Navegação principal">
         {ABAS.map((a) => (

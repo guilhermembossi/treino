@@ -53,13 +53,23 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - **Tema** (`src/tema.ts`): sem escolha, segue o aparelho; o sol/lua (`aria-label` "Mudar para tema claro/escuro") guarda a escolha em `localStorage` `treino-tema` e pinta a barra de status (`theme-color`).
 - **Navegação** pelo `#` do endereço (`#/`, `#/historico`, `#/fichas`): funciona no Pages sem configuração e o voltar do celular volta de aba. Telas em `src/telas/`.
 - Testar local: `npm run build` e `npx vite preview --port 4173 --host 127.0.0.1` → http://127.0.0.1:4173/treino/ (use 127.0.0.1, não localhost).
-- Ainda sem service worker (tarefa 3.2) e sem Supabase no app (tarefa 2.2).
+- Ainda sem service worker (tarefa 3.2).
 
 ## Login (tarefa 1.3, 23/10/2026)
 - Supabase Auth com e-mail e senha, confirmação por e-mail obrigatória, senha mínima de 8, sem anônimo nem outros provedores.
 - Site URL `https://guilhermembossi.github.io/treino/`. Redirect URLs: `https://guilhermembossi.github.io/treino/**` e `http://127.0.0.1:4173/treino/**` (teste local). No app, mandar `emailRedirectTo`/`redirectTo` para o endereço atual dentro dessas.
 - O que dá para conferir sem conta: `GET /auth/v1/settings` com a chave publicável (`external.email`, `disable_signup`, `mailer_autoconfirm`). Site URL e senha mínima só pelo painel ou criando conta.
 - E-mail grátis do Supabase: só para os e-mails da equipe do projeto e com limite por hora. Para outras pessoas, configurar SMTP próprio. Os modelos de e-mail vêm em inglês.
+
+## Telas de login (tarefa 2.2, 23/10/2026)
+- `src/config/supabase.ts`: URL e chave **publicável** (`sb_publishable_…`). `src/supabase.ts`: o cliente (sessão no `localStorage`, renovação automática), `enderecoDoApp()` para os links dos e-mails e `mensagemDeErro` (código do Supabase → português).
+- Fluxo **implicit** (padrão do supabase-js): o link do e-mail traz o token no `#` e funciona mesmo aberto em outro navegador. Não trocar para PKCE sem pensar: no iPhone, o Safari e o app instalado guardam dados separados.
+- `erroDoLink` lê `#error=…` (link vencido etc.) **antes** do cliente limpar o endereço.
+- `src/sessao.ts` (`useSessao`): sem sessão → `telas/Acesso.tsx` (Entrar, Criar conta, Esqueci a senha). O evento `PASSWORD_RECOVERY` abre "Nova senha".
+- Criar conta grava o nome em `user_metadata.nome` (o "Olá, <nome>" usa o primeiro nome). E-mail já cadastrado: o Supabase não avisa (devolve sem `identities`); a tela mostra uma mensagem neutra.
+- Senha mínima conferida **só no Supabase** (fonte única); a tela só mostra a dica.
+- Sair: link no rodapé do Início (com o e-mail da conta).
+- `componentes/Logo.tsx` e `componentes/BotaoTema.tsx` são usados no topo e no login.
 
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
@@ -73,4 +83,4 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação) e 1.3 (login no painel) feitas em 23/10/2026. Próxima: 2.2 (telas de login), que também confere na prática o Site URL e a senha mínima.
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 espera o Guilherme criar a conta no celular. Próxima: 2.3 (instalar no iPhone).

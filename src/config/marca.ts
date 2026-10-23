@@ -12,6 +12,7 @@ export type Paleta = {
   primaria: string;    // botões principais e item ativo
   sobrePrimaria: string; // texto em cima da cor primária
   sucesso: string;     // série feita
+  erro: string;        // mensagens de erro
 };
 
 export const marca = {
@@ -30,6 +31,7 @@ export const marca = {
       primaria: '#0f766e',
       sobrePrimaria: '#ffffff',
       sucesso: '#16a34a',
+      erro: '#c2410c',
     },
     escuro: {
       fundo: '#0d1312',
@@ -40,6 +42,7 @@ export const marca = {
       primaria: '#2dd4bf',
       sobrePrimaria: '#06201d',
       sucesso: '#4ade80',
+      erro: '#fb923c',
     },
   } satisfies Record<'claro' | 'escuro', Paleta>,
   icone: { fundo: '#0f766e', desenho: '#ffffff' },
