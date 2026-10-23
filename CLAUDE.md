@@ -44,10 +44,16 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - `treinos` guarda `nome_ficha` e `treino_series` guarda `exercicio_nome`: o histórico não depende da ficha. Apagar a ficha deixa `treinos.ficha_id` vazio; apagar ficha ou exercício apaga os filhos.
 - RLS: 4 políticas por tabela (ler, criar, alterar, apagar), só para `authenticated` e só do dono. Nas filhas, criar e alterar também exigem que o pai seja do usuário. O `anon` não tem nenhuma permissão nas tabelas.
 
+## Testes de segurança (tarefa 1.2, 23/10/2026)
+Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
+- `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
+- `testes/teste_dois_usuarios.sql`: cria 2 usuários sem senha dentro de uma transação e age como cada um (papel `authenticated` + `request.jwt.claims`, como a API faz). Termina com `raise exception` de propósito: o resultado vem na mensagem de erro e tudo é desfeito. Esperado: "31 OK, 0 FALHOU". Rodar pelo `execute_sql`. Tabela nova: incluir nas listas e nos testes de pai de outro usuário.
+- Em PL/pgSQL, `text[] || 'literal'` dá erro de array: usar `|| text 'literal'`.
+
 ## Pontos de atenção
 - Supabase grátis pausa após 7 dias sem uso.
 - E-mail de confirmação do cadastro precisa apontar para o endereço do app (tarefa 1.3).
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo) e 1.1 (tabelas) feitas em 23/10/2026. Próxima: 1.2 (teste de segurança).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas) e 1.2 (teste de segurança) feitas em 23/10/2026. Próxima pela ordem: 2.1 (esqueleto do app e publicação), porque a 1.3 depende do endereço publicado.
