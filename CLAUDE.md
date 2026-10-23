@@ -17,6 +17,7 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - Repositório **público**: nenhuma chave secreta no código. No app só entram a URL do Supabase e a chave **publicável**. Nunca usar a chave `service_role` no app.
 - **RLS em todas as tabelas**, sempre. Nenhuma tabela nova sem política `user_id = auth.uid()`; nas filhas, conferir que o pai também é do usuário.
 - Ao fim de cada tarefa de banco: Security Advisor do Supabase sem alertas de segurança e teste de que um usuário deslogado e um segundo usuário não enxergam os dados.
+  - **Exceção conhecida (23/10/2026, decisão do Guilherme):** "Leaked Password Protection Disabled" (recurso do plano Pro). Qualquer outro aviso tem que ser resolvido. Pendência antes de outras pessoas usarem: conferir a senha na base Pwned Passwords pelo app (ver "Antes de outras pessoas usarem" no `tarefas.md`).
 - Nome, cores e logo só em `src/config/marca.ts` (white label), nunca espalhados no código.
 - Textos da tela em português. Telas seguem a seção "Telas (V1)" da `arquitetura.md`.
 - Ao fim de cada tarefa: atualizar este `CLAUDE.md`, o "Já feito" da `arquitetura.md` e o status no `tarefas.md`.
@@ -83,4 +84,4 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 espera o Guilherme criar a conta no celular. Próxima: 2.3 (instalar no iPhone).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. Próxima: 2.3 (instalar no iPhone).
