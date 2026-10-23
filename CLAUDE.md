@@ -44,6 +44,17 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - `treinos` guarda `nome_ficha` e `treino_series` guarda `exercicio_nome`: o histórico não depende da ficha. Apagar a ficha deixa `treinos.ficha_id` vazio; apagar ficha ou exercício apaga os filhos.
 - RLS: 4 políticas por tabela (ler, criar, alterar, apagar), só para `authenticated` e só do dono. Nas filhas, criar e alterar também exigem que o pai seja do usuário. O `anon` não tem nenhuma permissão nas tabelas.
 
+## App (tarefa 2.1, 23/10/2026)
+- Endereço: https://guilhermembossi.github.io/treino/ (GitHub Pages, `base` = `/treino/` no `vite.config.ts`).
+- Publicação: `.github/workflows/publicar.yml` a cada envio para a `main` (ou "Run workflow"). Pages com origem "GitHub Actions".
+- Versões fixas (`--save-exact`): React 19.3.1, Vite 8.3.5, plugin-react 6.1.2, TypeScript 5.9.3 (a 7.0 era nova demais), sharp 0.35.5 (só para os ícones).
+- **Marca:** `src/config/marca.ts` tem nome, descrição, idioma, as duas paletas (claro/escuro) e o logo (`logoSvg`). O plugin `marcaNoApp` do `vite.config.ts` põe isso no `index.html` (`%NOME%` etc., variáveis CSS dos temas e o script que aplica o tema antes de desenhar) e gera o `manifest.webmanifest`. Ícones em `public/icones/` saem de `npm run icones` (`scripts/gerar_icones.mjs`, que o Node lê o `.ts` direto: no `marca.ts` só sintaxe que pode ser apagada, sem enum).
+- CSS usa só as variáveis (`var(--primaria)` etc.); nenhuma cor escrita fora do `marca.ts`.
+- **Tema** (`src/tema.ts`): sem escolha, segue o aparelho; o sol/lua (`aria-label` "Mudar para tema claro/escuro") guarda a escolha em `localStorage` `treino-tema` e pinta a barra de status (`theme-color`).
+- **Navegação** pelo `#` do endereço (`#/`, `#/historico`, `#/fichas`): funciona no Pages sem configuração e o voltar do celular volta de aba. Telas em `src/telas/`.
+- Testar local: `npm run build` e `npx vite preview --port 4173 --host 127.0.0.1` → http://127.0.0.1:4173/treino/ (use 127.0.0.1, não localhost).
+- Ainda sem service worker (tarefa 3.2) e sem Supabase no app (tarefa 2.2).
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -56,4 +67,4 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas) e 1.2 (teste de segurança) feitas em 23/10/2026. Próxima pela ordem: 2.1 (esqueleto do app e publicação), porque a 1.3 depende do endereço publicado.
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança) e 2.1 (esqueleto e publicação) feitas em 23/10/2026. Próxima: 1.3 (configurar o login, com parada manual), depois 2.2.

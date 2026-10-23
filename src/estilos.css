@@ -1,0 +1,103 @@
+/* As cores (--fundo, --primaria...) vêm de src/config/marca.ts, injetadas no index.html pelo vite.config.ts. */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1 { font-size: 1.6rem; margin: 0.5rem 0 1rem; }
+p { margin: 0 0 0.75rem; line-height: 1.4; }
+button { font: inherit; }
+
+.app { min-height: 100dvh; }
+
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 0.5rem) 1rem 0.5rem;
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borda);
+}
+
+.marca { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.1rem; }
+.marca img { border-radius: 7px; }
+
+.botao-icone {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto);
+  cursor: pointer;
+}
+.botao-icone:active { background: var(--borda); }
+
+.conteudo {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem 1rem calc(env(safe-area-inset-bottom) + 5.5rem);
+}
+
+.cartao {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.rotulo { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--textoFraco); }
+.fraco { color: var(--textoFraco); margin: 0; }
+
+.botao-primario {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--primaria);
+  color: var(--sobrePrimaria);
+  font-weight: 700;
+  cursor: pointer;
+}
+.botao-primario:disabled { opacity: 0.45; cursor: default; }
+
+.barra {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--superficie);
+  border-top: 1px solid var(--borda);
+}
+
+.barra-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 56px;
+  padding-top: 8px;
+  font-size: 0.75rem;
+  color: var(--textoFraco);
+  text-decoration: none;
+}
+.barra-item[aria-current='page'] { color: var(--primaria); font-weight: 600; }
+
+:focus-visible { outline: 2px solid var(--primaria); outline-offset: 2px; }
