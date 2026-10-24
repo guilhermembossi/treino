@@ -86,6 +86,14 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - No iPhone o app instalado tem IndexedDB próprio, separado do Safari.
 - Classe com `private` no parâmetro do construtor não compila (`erasableSyntaxOnly`): declarar os campos.
 
+## App abre sem internet (tarefa 3.2, 24/10/2026)
+- Service worker: modelo em `sw/modelo.js`. O plugin `serviceWorker` do `vite.config.ts` (no fim do build) põe a lista de todos os arquivos do `dist`, a versão (hash deles) e o prefixo (`marca.id`), e grava `dist/sw.js`. **Não escrever as marcas com dois sublinhados em comentário do modelo** (o `replace` pega a primeira).
+- Estratégia: instala baixando tudo (`<id>-telas-<versão>`) e assume na hora (`skipWaiting` + `clients.claim`); ativa apagando as versões antigas. Os pedidos do próprio app saem primeiro do celular (navegação → `index.html`); os do Supabase (outro endereço) passam direto.
+- `ignoreVary: true` na busca do cache é obrigatório: o servidor responde com `Vary` e o script é pedido com cabeçalhos diferentes; sem isso, o app abre sem internet só com a tela em branco.
+- `main.tsx` registra só no build (`import.meta.env.PROD`) e chama `reg.update()` ao abrir e ao voltar para o app (o iPhone quase não procura sozinho). **Versão nova aparece na abertura seguinte**, não na mesma.
+- Sessão sem internet: com o acesso vencido (1 h), o `getSession` devolve "sem sessão" quando não consegue renovar. `useSessao` usa então a sessão guardada no aparelho (`sessaoGuardada`, chave `sb-<ref>-auth-token`), e o supabase-js renova sozinho quando a internet volta. Eventos sem sessão (que não são `SIGNED_OUT`) não tiram o usuário do app.
+- O navegador interno do Claude não aceita service worker ("unknown error when fetching the script"). Para testar, usar o Edge sem janela com `playwright-core` (fora do projeto): abrir, `setOffline(true)`, recarregar.
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -98,5 +106,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi publicada em 24/10/2026 e espera o teste do Guilherme em modo avião. Próxima: 3.2 (abrir sem internet).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 4.1 (fichas).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.

@@ -1,3 +1,6 @@
+import { createHash } from 'node:crypto';
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { marca, type Paleta } from './src/config/marca.ts';
@@ -57,7 +60,31 @@ function marcaNoApp(): Plugin {
   };
 }
 
+// Gera dist/sw.js a partir de sw/modelo.js com a lista de todos os arquivos publicados.
+// A versão muda sempre que algum arquivo muda: o celular baixa a versão nova sozinho.
+function serviceWorker(): Plugin {
+  let pasta = 'dist';
+  return {
+    name: 'service-worker',
+    apply: 'build',
+    configResolved(c) { pasta = c.build.outDir; },
+    closeBundle() {
+      const arquivos = (readdirSync(pasta, { recursive: true, withFileTypes: true }) as import('node:fs').Dirent[])
+        .filter((d) => d.isFile() && d.name !== 'sw.js')
+        .map((d) => relative(pasta, join(d.parentPath, d.name)).replaceAll('\\', '/'))
+        .sort();
+      const hash = createHash('sha256');
+      for (const a of arquivos) hash.update(a).update(readFileSync(join(pasta, a)));
+      const sw = readFileSync('sw/modelo.js', 'utf8')
+        .replace('__VERSAO__', hash.digest('hex').slice(0, 12))
+        .replace('__PREFIXO__', marca.id)
+        .replace('__ARQUIVOS__', JSON.stringify(arquivos));
+      writeFileSync(join(pasta, 'sw.js'), sw);
+    },
+  };
+}
+
 export default defineConfig({
   base: BASE,
-  plugins: [react(), marcaNoApp()],
+  plugins: [react(), marcaNoApp(), serviceWorker()],
 });
