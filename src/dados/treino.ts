@@ -103,6 +103,43 @@ export function ultimaMarcada(series: TreinoSerie[], treinoId: string, exercicio
     .sort((a, b) => b.feita_em!.localeCompare(a.feita_em!))[0];
 }
 
+// Resumo ao finalizar (tarefa 5.4).
+export type Mudanca = { exercicio: string; texto: string; direcao: 'subiu' | 'desceu' };
+export type Resumo = { duracaoSeg: number; feitas: number; planejadas: number; volumeKg: number; mudancas: Mudanca[]; primeiraVez: boolean };
+
+// Compara cada exercício com a última vez da ficha: primeiro a maior carga; com a mesma carga, o total de reps.
+// `planejadas` = séries da ficha; `doTreino` = séries registradas neste treino (só as marcadas contam).
+export function resumoTreino(treino: Treino, planejadas: number, doTreino: TreinoSerie[], ultima: Map<string, Valores>): Resumo {
+  const feitas = doTreino.filter((s) => s.feita_em);
+  const volumeKg = feitas.reduce((v, s) => v + (s.carga ?? 0) * (s.reps ?? 0), 0);
+  const duracaoSeg = treino.duracao_seg ?? Math.max(0, Math.round((Date.parse(treino.fim ?? new Date().toISOString()) - Date.parse(treino.inicio)) / 1000));
+
+  const antesPorExercicio = new Map<string, Valores[]>();
+  for (const [chave, v] of ultima) {
+    const nome = chave.slice(0, chave.lastIndexOf('|'));
+    antesPorExercicio.set(nome, [...(antesPorExercicio.get(nome) ?? []), v]);
+  }
+  const agoraPorExercicio = new Map<string, Valores[]>();
+  for (const s of feitas) agoraPorExercicio.set(s.exercicio_nome, [...(agoraPorExercicio.get(s.exercicio_nome) ?? []), s]);
+
+  const maxCarga = (l: Valores[]) => { const c = l.map((v) => v.carga).filter((x): x is number => x !== null); return c.length ? Math.max(...c) : null; };
+  const somaReps = (l: Valores[]) => l.reduce((n, v) => n + (v.reps ?? 0), 0);
+
+  const mudancas: Mudanca[] = [];
+  for (const [exercicio, agora] of agoraPorExercicio) {
+    const antes = antesPorExercicio.get(exercicio);
+    if (!antes) continue;
+    const [ca, cb] = [maxCarga(agora), maxCarga(antes)];
+    if (ca !== null && cb !== null && ca !== cb) {
+      mudancas.push({ exercicio, texto: `${kg(ca)} kg, antes ${kg(cb)} kg`, direcao: ca > cb ? 'subiu' : 'desceu' });
+    } else if (ca === cb) {
+      const [ra, rb] = [somaReps(agora), somaReps(antes)];
+      if (ra !== rb) mudancas.push({ exercicio, texto: `${ra} reps no total, antes ${rb}`, direcao: ra > rb ? 'subiu' : 'desceu' });
+    }
+  }
+  return { duracaoSeg, feitas: feitas.length, planejadas, volumeKg: Math.round(volumeKg * 100) / 100, mudancas, primeiraVez: ultima.size === 0 };
+}
+
 // Dia no horário do aparelho, no formato 2026-10-24.
 export const diaLocal = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -127,8 +164,9 @@ export function cronometro(segundos: number): string {
   return `${h ? `${h}:` : ''}${mm}:${String(r).padStart(2, '0')}`;
 }
 
-// 3480 → "58 min"; 4500 → "1 h 15 min".
+// 3480 → "58 min"; 4500 → "1 h 15 min"; 20 → "< 1 min".
 export function duracaoCurta(segundos: number): string {
+  if (segundos < 30) return '< 1 min';
   const min = Math.round(segundos / 60);
   if (min < 60) return `${min} min`;
   const h = Math.floor(min / 60), m = min % 60;

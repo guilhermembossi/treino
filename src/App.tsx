@@ -11,6 +11,7 @@ import IndicadorSync from './componentes/IndicadorSync';
 import Acesso from './telas/Acesso';
 import Inicio, { ROTA_TREINO } from './telas/Inicio';
 import Treino from './telas/Treino';
+import ResumoTreino, { ROTA_RESUMO } from './telas/ResumoTreino';
 import Historico from './telas/Historico';
 import Fichas from './telas/Fichas';
 
@@ -37,10 +38,10 @@ export default function App() {
 // O app de quem já entrou: topo, tela da aba e barra de baixo.
 export function Casca({ sessao, remoto }: { sessao: Session; remoto?: Remoto }) {
   const [aba, setAba] = useState<Aba>(abaDoEndereco);
-  const [noTreino, setNoTreino] = useState(() => location.hash.startsWith(ROTA_TREINO));
+  const [hash, setHash] = useState(location.hash);
 
   useEffect(() => {
-    const aoMudar = () => { setAba(abaDoEndereco()); setNoTreino(location.hash.startsWith(ROTA_TREINO)); window.scrollTo(0, 0); };
+    const aoMudar = () => { setAba(abaDoEndereco()); setHash(location.hash); window.scrollTo(0, 0); };
     window.addEventListener('hashchange', aoMudar);
     return () => window.removeEventListener('hashchange', aoMudar);
   }, []);
@@ -61,7 +62,11 @@ export function Casca({ sessao, remoto }: { sessao: Session; remoto?: Remoto }) 
           </div>
         </header>
 
-        <main className="conteudo">{noTreino ? <Treino /> : atual.tela(sessao)}</main>
+        <main className="conteudo">
+          {hash.startsWith(ROTA_TREINO) ? <Treino />
+            : hash.startsWith(ROTA_RESUMO) ? <ResumoTreino key={hash} id={hash.slice(ROTA_RESUMO.length)} />
+              : atual.tela(sessao)}
+        </main>
 
         <nav className="barra" aria-label="Navegação principal">
           {ABAS.map((a) => (

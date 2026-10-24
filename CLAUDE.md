@@ -133,6 +133,13 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - Aviso ao zerar (uma vez, `avisou`): `src/som.ts`, 3 bipes por Web Audio e `navigator.vibrate`. `prepararSom()` roda no toque em Descansar (o iPhone só libera áudio num toque) e põe `navigator.audioSession.type = 'transient'` (mistura com a música).
 - **Limites do iPhone:** não vibra (o Safari não tem a API), não toca com a tela bloqueada nem, provavelmente, no modo silencioso.
 
+## Finalizar e resumo (tarefa 5.4, 24/10/2026)
+- **Finalizar** (topo da tela do treino, embaixo do cronômetro): confirmação que avisa quantas séries faltam; encerra o descanso; grava `fim` e `duracao_seg` (do celular) e abre `#/resumo/<id>` (`telas/ResumoTreino.tsx`; o `App.tsx` escolhe a tela pelo `hash`).
+- Resumo (`resumoTreino` em `dados/treino.ts`): duração, séries marcadas de quantas a ficha tem, volume (soma de carga × reps das marcadas) e "Desde a última vez": por exercício, a maior carga; com a mesma carga, o total de reps (▲ verde / ▼ vermelho). Só exercícios que existiam da última vez. Primeira vez da ficha: frase própria.
+- A "última vez" do resumo usa só treinos **anteriores** a ele (`inicio` menor), para um resumo antigo continuar certo.
+- **Salvar e sair** só volta ao Início (já foi salvo no Finalizar). **Voltar ao treino** reabre (`fim` e `duracao_seg` = null), só se não houver outro treino aberto.
+- Séries criadas e não marcadas ficam no banco com `feita_em` null (não contam em nada).
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -145,5 +152,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 5.4 (finalizar).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi aprovada em 24/10/2026. A 5.4 (finalizar e resumo) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 6.1 (histórico).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.

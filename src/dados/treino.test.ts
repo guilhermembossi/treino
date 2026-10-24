@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ajustarDescanso, chaveSerie, cronometro, descansoReal, duracaoCurta, faixaReps, kg, proximaFicha, restanteDescanso, semana,
-  tempoMedio, treinoAberto, ultimaMarcada, ultimaVez, valoresIniciais, type Descanso,
+  ajustarDescanso, chaveSerie, cronometro, descansoReal, duracaoCurta, faixaReps, kg, proximaFicha, restanteDescanso, resumoTreino,
+  semana, tempoMedio, treinoAberto, ultimaMarcada, ultimaVez, valoresIniciais, type Descanso,
 } from './treino';
 import type { Ficha, FichaSerie, Treino, TreinoSerie } from './tipos';
 
@@ -144,11 +144,49 @@ describe('descanso', () => {
   });
 });
 
+describe('resumo ao finalizar', () => {
+  const st = (id: string, nome: string, n: number, carga: number | null, reps: number | null, feita = true): TreinoSerie => ({
+    ...base, id, treino_id: 'atual', exercicio_nome: nome, serie_n: n, carga, reps, descanso_seg: null,
+    feita_em: feita ? '2026-10-24T10:10:00Z' : null,
+  });
+  const atual = { ...treino('SupB', '2026-10-24T10:00:00Z', 3480), id: 'atual' };
+  const ultima = new Map([
+    [chaveSerie('Supino inclinado', 1), { carga: 16, reps: 10 }],
+    [chaveSerie('Supino inclinado', 2), { carga: 16, reps: 9 }],
+    [chaveSerie('Remada', 1), { carga: 20, reps: 10 }],
+    [chaveSerie('Flexão', 1), { carga: null, reps: 12 }],
+    [chaveSerie('Elevação', 1), { carga: 8, reps: 15 }],
+  ]);
+  const series = [
+    st('a', 'Supino inclinado', 1, 18, 10),
+    st('b', 'Supino inclinado', 2, 18, 8),
+    st('c', 'Remada', 1, 20, 12),
+    st('d', 'Flexão', 1, null, 10),
+    st('e', 'Elevação', 1, 6, 15),
+    st('f', 'Elevação', 2, 6, 15, false), // não marcada: fora
+    st('g', 'Novo exercício', 1, 10, 10), // sem última vez: fora das mudanças
+  ];
+  it('duração, séries, volume e o que mudou', () => {
+    const r = resumoTreino(atual, 20, series, ultima);
+    expect(r).toMatchObject({ duracaoSeg: 3480, feitas: 6, planejadas: 20, primeiraVez: false });
+    expect(r.volumeKg).toBe(18 * 10 + 18 * 8 + 20 * 12 + 6 * 15 + 10 * 10);
+    expect(r.mudancas).toEqual([
+      { exercicio: 'Supino inclinado', texto: '18 kg, antes 16 kg', direcao: 'subiu' },
+      { exercicio: 'Remada', texto: '12 reps no total, antes 10', direcao: 'subiu' },
+      { exercicio: 'Flexão', texto: '10 reps no total, antes 12', direcao: 'desceu' },
+      { exercicio: 'Elevação', texto: '6 kg, antes 8 kg', direcao: 'desceu' },
+    ]);
+  });
+  it('primeira vez da ficha', () => {
+    expect(resumoTreino(atual, 20, series, new Map())).toMatchObject({ primeiraVez: true, mudancas: [] });
+  });
+});
+
 describe('formatos', () => {
   it('cronômetro', () => {
     expect([cronometro(5), cronometro(125), cronometro(3725)]).toEqual(['0:05', '2:05', '1:02:05']);
   });
   it('duração curta', () => {
-    expect([duracaoCurta(3480), duracaoCurta(4500), duracaoCurta(7200)]).toEqual(['58 min', '1 h 15 min', '2 h']);
+    expect([duracaoCurta(3480), duracaoCurta(4500), duracaoCurta(7200), duracaoCurta(20)]).toEqual(['58 min', '1 h 15 min', '2 h', '< 1 min']);
   });
 });

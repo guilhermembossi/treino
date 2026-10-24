@@ -220,6 +220,32 @@ button { font: inherit; }
 .obs { font-style: italic; margin-top: 0.25rem; }
 .nota { font-size: 0.85rem; text-align: center; margin-top: 1rem; }
 .progresso { margin-top: 0.15rem !important; font-size: 0.85rem; }
+.treino-relogio { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; }
+.botao-finalizar {
+  min-height: 40px;
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primaria);
+  color: var(--sobrePrimaria);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Resumo ao finalizar */
+.numeros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0; }
+.numero { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.75rem 0.25rem; text-align: center; }
+.numero-valor { font-size: 1.05rem; font-weight: 800; }
+.numero-nome { font-size: 0.75rem; color: var(--textoFraco); }
+.mudancas p { margin: 0; }
+.mudancas ul { list-style: none; margin: 0.5rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.mudancas li { display: flex; gap: 0.5rem; align-items: baseline; }
+.mudancas .seta { font-size: 0.75rem; }
+.mudancas .subiu .seta { color: var(--sucesso); }
+.mudancas .desceu .seta { color: var(--erro); }
+.botao-link { display: grid; place-items: center; margin-top: 1.25rem; text-decoration: none; }
+.link.centro { display: block; margin: 0.5rem auto 0; }
 
 .exercicio-treino { padding: 0.75rem 0.6rem 0.5rem; }
 .exercicio-cabeca { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }

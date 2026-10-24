@@ -7,13 +7,14 @@ import type { FichaExercicio, FichaSerie, TreinoSerie } from '../dados/tipos';
 import { CampoNumero } from '../componentes/Campos';
 import { BarraDescanso, useDescanso } from '../componentes/Descanso';
 import { IconeCheck, IconeVoltar } from '../icones';
+import { ROTA_RESUMO } from './ResumoTreino';
 
 const PASSO_KG = 2.5;
 const DESCANSO_PADRAO = 90; // exercício sem descanso definido
 
 // Treino em andamento (#/treino): um cartão por exercício e uma linha por série.
 // Carga e reps já vêm com o que foi feito da última vez nessa ficha (ou o alvo); cada mudança e cada
-// marcação salvam na hora (fechar o app não perde nada). Descansar abre o timer (5.3). Finalizar: 5.4.
+// marcação salvam na hora (fechar o app não perde nada). Descansar abre o timer (5.3); Finalizar abre o resumo (5.4).
 export default function Treino() {
   const dados = useDados();
   const treinos = useLista('treinos');
@@ -67,6 +68,18 @@ export default function Treino() {
     location.hash = '#/';
   }
 
+  // Grava fim e duração e abre o resumo. Pergunta antes, avisando se faltam séries.
+  async function finalizar() {
+    const faltam = total - marcadas;
+    if (!confirm(faltam > 0 ? `Finalizar o treino? Faltam ${faltam} de ${total} séries.` : 'Finalizar o treino?')) return;
+    terminar();
+    const fim = new Date();
+    await dados.salvar('treinos', {
+      id: treino!.id, fim: fim.toISOString(), duracao_seg: Math.max(0, Math.round((fim.getTime() - Date.parse(treino!.inicio)) / 1000)),
+    });
+    location.hash = `${ROTA_RESUMO}${treino!.id}`;
+  }
+
   const descansar = (e: FichaExercicio) =>
     comecar(e.nome, ultimaMarcada(feitas, treino.id, e.nome)?.id ?? null, e.descanso_seg ?? DESCANSO_PADRAO);
 
@@ -78,7 +91,10 @@ export default function Treino() {
           <h1 className="treino-titulo">{treino.nome_ficha}</h1>
           <p className="fraco progresso">{marcadas} de {total} séries</p>
         </div>
-        <p className="cronometro" role="timer" aria-label="Tempo de treino">{cronometro((agora - Date.parse(treino.inicio)) / 1000)}</p>
+        <div className="treino-relogio">
+          <p className="cronometro" role="timer" aria-label="Tempo de treino">{cronometro((agora - Date.parse(treino.inicio)) / 1000)}</p>
+          <button type="button" className="botao-finalizar" onClick={() => void finalizar()}>Finalizar</button>
+        </div>
       </div>
 
       <ul className="lista lista-exercicios">
