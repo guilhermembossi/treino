@@ -38,6 +38,10 @@ export const IconeMais = () => (
   <svg {...props}><path d="M12 5v14M5 12h14" /></svg>
 );
 
+export const IconeCheck = () => (
+  <svg {...props} strokeWidth={3}><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+);
+
 export const IconeLua = () => (
   <svg {...props}><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a6.5 6.5 0 0 0 11 11Z" /></svg>
 );

@@ -81,8 +81,10 @@ export class Dados {
   }
 
   // Cria (sem id) ou altera (com id). Devolve o registro salvo.
-  async salvar<T extends Tabela>(tabela: T, dados: Partial<Registros[T]>): Promise<Registros[T]> {
-    const [salvo] = await this.gravar(tabela, [dados]);
+  // `iniciais`: campos usados só se o registro ainda não existe (gravações quase juntas no mesmo id
+  // não se sobrescrevem com valores velhos: cada uma muda só o que trouxe em `dados`).
+  async salvar<T extends Tabela>(tabela: T, dados: Partial<Registros[T]>, iniciais?: Partial<Registros[T]>): Promise<Registros[T]> {
+    const [salvo] = await this.gravar(tabela, [dados], this.agora(), iniciais);
     return salvo;
   }
 
@@ -106,7 +108,9 @@ export class Dados {
     for (const [t, i] of lote) await this.gravar(t, [{ id: i, excluido_em: quando } as Partial<Registros[Tabela]>], quando);
   }
 
-  private async gravar<T extends Tabela>(tabela: T, lista: Partial<Registros[T]>[], quando = this.agora()) {
+  private async gravar<T extends Tabela>(
+    tabela: T, lista: Partial<Registros[T]>[], quando = this.agora(), iniciais?: Partial<Registros[T]>,
+  ) {
     const tx = this.db.transaction([tabela, 'pendentes'], 'readwrite');
     const loja = tx.objectStore(tabela);
     const salvos: Registros[T][] = [];
@@ -114,6 +118,7 @@ export class Dados {
       const id = dados.id ?? crypto.randomUUID();
       const atual = (await loja.get(id)) as Registros[T] | undefined;
       const reg = {
+        ...(atual ? undefined : iniciais),
         ...atual,
         ...dados,
         id,

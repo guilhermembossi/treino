@@ -1,16 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDados, useLista } from '../dados/contexto';
-import { cronometro, treinoAberto } from '../dados/treino';
-import { IconeVoltar } from '../icones';
+import {
+  chaveSerie, cronometro, faixaReps, kg, treinoAberto, ultimaVez, valoresIniciais, type Valores,
+} from '../dados/treino';
+import type { FichaExercicio, FichaSerie, TreinoSerie } from '../dados/tipos';
+import { CampoNumero } from '../componentes/Campos';
+import { IconeCheck, IconeVoltar } from '../icones';
 
-// Treino em andamento (#/treino). Tarefa 5.1: ficha, cronômetro e os exercícios do dia.
-// Marcar as séries chega na 5.2, o timer de descanso na 5.3 e o Finalizar na 5.4.
+const PASSO_KG = 2.5;
+
+// Treino em andamento (#/treino): um cartão por exercício e uma linha por série.
+// Carga e reps já vêm com o que foi feito da última vez nessa ficha (ou o alvo); cada mudança e cada
+// marcação salvam na hora (fechar o app não perde nada). Timer de descanso: 5.3. Finalizar: 5.4.
 export default function Treino() {
   const dados = useDados();
   const treinos = useLista('treinos');
   const exercicios = useLista('ficha_exercicios');
-  const series = useLista('ficha_series');
+  const planejadas = useLista('ficha_series');
+  const feitas = useLista('treino_series');
   const [agora, setAgora] = useState(() => Date.now());
+  // id de cada série do treino, fixo desde a primeira mudança (duas gravações seguidas caem no mesmo registro).
+  const ids = useRef(new Map<string, string>());
 
   // O cronômetro conta a partir do horário de início salvo: continua certo mesmo se o app ficar fechado.
   useEffect(() => {
@@ -18,8 +28,13 @@ export default function Treino() {
     return () => clearInterval(t);
   }, []);
 
-  if (!treinos || !exercicios || !series) return null;
-  const treino = treinoAberto(treinos);
+  const treino = treinos ? treinoAberto(treinos) : undefined;
+  const ultima = useMemo(
+    () => (treino && treinos && feitas ? ultimaVez(treino.ficha_id, treinos, feitas, treino.id) : new Map<string, Valores>()),
+    [treino, treinos, feitas],
+  );
+
+  if (!treinos || !exercicios || !planejadas || !feitas) return null;
 
   if (!treino) {
     return (
@@ -31,6 +46,16 @@ export default function Treino() {
   }
 
   const doTreino = exercicios.filter((e) => e.ficha_id === treino.ficha_id).sort((a, b) => a.ordem - b.ordem);
+  const registros = new Map(feitas.filter((s) => s.treino_id === treino.id).map((s) => [chaveSerie(s.exercicio_nome, s.serie_n), s]));
+  for (const [chave, s] of registros) if (!ids.current.has(chave)) ids.current.set(chave, s.id);
+  const idDe = (chave: string) => {
+    if (!ids.current.has(chave)) ids.current.set(chave, crypto.randomUUID());
+    return ids.current.get(chave)!;
+  };
+
+  const seriesDe = (e: FichaExercicio) => planejadas.filter((s) => s.ficha_exercicio_id === e.id).sort((a, b) => a.serie_n - b.serie_n);
+  const total = doTreino.reduce((n, e) => n + seriesDe(e).length, 0);
+  const marcadas = doTreino.reduce((n, e) => n + seriesDe(e).filter((s) => registros.get(chaveSerie(e.nome, s.serie_n))?.feita_em).length, 0);
 
   async function descartar() {
     if (!confirm(`Descartar o treino "${treino!.nome_ficha}"? Ele não vai para o histórico.`)) return;
@@ -44,27 +69,85 @@ export default function Treino() {
         <div>
           <p className="rotulo">Treino em andamento</p>
           <h1 className="treino-titulo">{treino.nome_ficha}</h1>
+          <p className="fraco progresso">{marcadas} de {total} séries</p>
         </div>
         <p className="cronometro" role="timer" aria-label="Tempo de treino">{cronometro((agora - Date.parse(treino.inicio)) / 1000)}</p>
       </div>
 
-      <ul className="lista">
-        {doTreino.map((e) => {
-          const ss = series.filter((s) => s.ficha_exercicio_id === e.id).sort((a, b) => a.serie_n - b.serie_n);
-          const faixa = ss[0] && ss[0].reps_min !== null ? ` · ${ss[0].reps_min}${ss[0].reps_max !== ss[0].reps_min ? `-${ss[0].reps_max}` : ''} reps` : '';
-          return (
-            <li key={e.id} className="cartao">
-              <p className="item-nome">{e.nome}</p>
-              <p className="fraco">{ss.length} {ss.length === 1 ? 'série' : 'séries'}{faixa}{e.descanso_seg ? ` · descanso ${e.descanso_seg} s` : ''}</p>
-              {e.observacao && <p className="fraco obs">{e.observacao}</p>}
-            </li>
-          );
-        })}
+      <ul className="lista lista-exercicios">
+        {doTreino.map((e) => (
+          <li key={e.id} className="cartao exercicio-treino">
+            <p className="item-nome quebra">{e.nome}</p>
+            <p className="fraco detalhe-exercicio">
+              {e.descanso_seg ? `Descanso ${e.descanso_seg} s` : 'Sem descanso definido'}
+            </p>
+            {e.observacao && <p className="fraco obs">{e.observacao}</p>}
+
+            <div className="serie-treino serie-treino-cabecalho" aria-hidden="true">
+              <span>Série</span><span className="col-carga">Carga kg</span><span>Reps</span><span>Alvo</span><span />
+            </div>
+            <ol className="series-treino">
+              {seriesDe(e).map((p) => {
+                const chave = chaveSerie(e.nome, p.serie_n);
+                return (
+                  <LinhaSerie key={p.id} id={idDe(chave)} treinoId={treino.id} exercicio={e.nome} planejada={p}
+                    registro={registros.get(chave)} iniciais={valoresIniciais(e.nome, p, ultima)} />
+                );
+              })}
+            </ol>
+          </li>
+        ))}
       </ul>
       {doTreino.length === 0 && <p className="fraco vazio">Essa ficha não tem exercícios.</p>}
 
-      <p className="fraco nota">Marcar as séries chega na próxima etapa.</p>
       <button type="button" className="botao-perigo" onClick={() => void descartar()}>Descartar treino</button>
     </>
+  );
+}
+
+function LinhaSerie({ id, treinoId, exercicio, planejada, registro, iniciais }: {
+  id: string; treinoId: string; exercicio: string; planejada: FichaSerie; registro: TreinoSerie | undefined; iniciais: Valores;
+}) {
+  const dados = useDados();
+  const n = planejada.serie_n;
+  const carga = registro ? registro.carga : iniciais.carga;
+  const reps = registro ? registro.reps : iniciais.reps;
+  const feita = !!registro?.feita_em;
+  const alvoReps = faixaReps(planejada);
+  const alvo = [alvoReps, planejada.carga_alvo !== null ? `${kg(planejada.carga_alvo)} kg` : ''].filter(Boolean);
+
+  // Cada gravação muda só o que trouxe; o resto do registro (na 1ª vez, os valores da tela) fica como está.
+  const salvar = (campos: Partial<TreinoSerie>) => dados.salvar('treino_series', { id, ...campos }, {
+    treino_id: treinoId, exercicio_nome: exercicio, serie_n: n, carga: iniciais.carga, reps: iniciais.reps, descanso_seg: null, feita_em: null,
+  });
+
+  // ±2,5 parte do valor salvo mais recente (inclusive o que acabou de ser digitado).
+  async function ajustar(delta: number) {
+    const atual = await dados.obter('treino_series', id);
+    const base = (atual ? atual.carga : iniciais.carga) ?? 0;
+    await salvar({ carga: Math.min(1000, Math.max(0, Math.round((base + delta) * 100) / 100)) });
+  }
+
+  const rotulo = `Série ${n} de ${exercicio}`;
+  return (
+    <li className={`serie-treino${feita ? ' feita' : ''}`}>
+      <span className="serie-n">{n}</span>
+      <span className="col-carga">
+        <button type="button" className="botao-passo" aria-label={`${rotulo}: menos ${kg(PASSO_KG)} kg`} onClick={() => void ajustar(-PASSO_KG)}>−</button>
+        <CampoNumero valor={carga} max={1000} decimal placeholder="kg" aria-label={`${rotulo}: carga em kg`}
+          aoSalvar={(v) => void salvar({ carga: v })} />
+        <button type="button" className="botao-passo" aria-label={`${rotulo}: mais ${kg(PASSO_KG)} kg`} onClick={() => void ajustar(PASSO_KG)}>+</button>
+      </span>
+      <CampoNumero valor={reps} max={1000} placeholder="reps" aria-label={`${rotulo}: repetições`}
+        aoSalvar={(v) => void salvar({ reps: v })} />
+      <span className="alvo" aria-label={alvo.length ? `Alvo: ${alvo.join(', ')}` : 'Sem alvo'}>
+        {alvo.map((a) => <span key={a}>{a}</span>)}
+      </span>
+      <button type="button" className="botao-marcar" aria-pressed={feita}
+        aria-label={feita ? `${rotulo} feita. Tocar para desmarcar` : `Marcar ${rotulo.toLowerCase()} como feita`}
+        onClick={() => void salvar({ feita_em: feita ? null : new Date().toISOString() })}>
+        <IconeCheck />
+      </button>
+    </li>
   );
 }

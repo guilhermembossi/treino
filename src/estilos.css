@@ -219,6 +219,57 @@ button { font: inherit; }
 .cronometro { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--primaria); }
 .obs { font-style: italic; margin-top: 0.25rem; }
 .nota { font-size: 0.85rem; text-align: center; margin-top: 1rem; }
+.progresso { margin-top: 0.15rem !important; font-size: 0.85rem; }
+
+.exercicio-treino { padding: 0.75rem 0.6rem 0.5rem; }
+.exercicio-treino p { margin: 0; }
+.item-nome.quebra { white-space: normal; }
+.detalhe-exercicio { font-size: 0.8rem; margin-top: 0.15rem !important; }
+
+/* Linha da série: nº | − carga + | reps | alvo | ✓ */
+.serie-treino {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr) 3.1rem 2.6rem 2.9rem;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.2rem;
+  border-radius: 12px;
+}
+.series-treino { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.15rem; }
+.serie-treino-cabecalho { font-size: 0.7rem; color: var(--textoFraco); text-align: center; margin-top: 0.6rem; padding-bottom: 0; }
+.col-carga { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem; align-items: center; gap: 0.2rem; }
+.serie-treino-cabecalho .col-carga { display: block; }
+.serie-treino input { width: 100%; text-align: center; padding: 0 0.15rem !important; font-weight: 700; }
+.botao-passo {
+  height: 44px;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation; /* toques rápidos não dão zoom */
+}
+.botao-passo:active { background: var(--borda); }
+.alvo { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; line-height: 1.2; color: var(--textoFraco); }
+.botao-marcar {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 44px;
+  border: 2px solid var(--borda);
+  border-radius: 12px;
+  background: none;
+  color: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.botao-marcar svg { width: 22px; height: 22px; }
+.serie-treino.feita { background: color-mix(in srgb, var(--sucesso) 16%, transparent); }
+.serie-treino.feita .botao-marcar { background: var(--sucesso); border-color: var(--sucesso); color: var(--sobrePrimaria); }
+.serie-treino.feita input { background: transparent; }
 
 /* Listas e alça de arrastar */
 .lista, .lista-series { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }

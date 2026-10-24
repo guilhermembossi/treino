@@ -117,7 +117,14 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
   - `cronometro` e `duracaoCurta`.
 - Início (`telas/Inicio.tsx`): "Olá, <nome>"; cartão "Próximo treino" (exercícios e "cerca de X min"), **Começar treino**, **Trocar ficha** (botões com as fichas ativas; vale só para começar agora); com treino aberto, o cartão vira "Continuar treino"; faixa da semana. Sem fichas → "Criar fichas".
 - Começar grava em `treinos` (`ficha_id`, `nome_ficha`, `inicio` do celular, `fim` null) e abre `#/treino` (`telas/Treino.tsx`; a aba Início fica marcada). O cronômetro conta a partir de `inicio` (certo mesmo com o app fechado).
-- Tela do treino na 5.1: ficha, cronômetro e lista dos exercícios. **Descartar treino** (confirmação, exclusão marcada) foi acrescentado para não deixar treino aberto enquanto não existe o Finalizar (5.4).
+- Tela do treino: ver "Marcar séries" (5.2). **Descartar treino** (confirmação, exclusão marcada) foi acrescentado para não deixar treino aberto enquanto não existe o Finalizar (5.4).
+
+## Marcar séries (tarefa 5.2, 24/10/2026)
+- `telas/Treino.tsx`: um cartão por exercício da ficha (nome, descanso, observação) e uma linha por série planejada: nº | − carga + | reps | alvo (cinza) | ✓. Topo com "x de y séries" e o cronômetro.
+- `treino_series` liga ao exercício por **nome + nº da série** (`chaveSerie`); o registro só é criado na primeira mudança ou marcação. `feita_em` = marcada (null = desmarcada).
+- Valores na tela: o registro, se existir; senão `valoresIniciais` = a última vez dessa ficha (`ultimaVez`: treino finalizado mais recente da ficha com série marcada, por nome + nº) ou o alvo (carga alvo e reps = **mínimo** da faixa).
+- **Corrida campo × ✓** (sair do campo e marcar quase juntos): cada gravação manda só o que mudou, com o mesmo id (fixo por série, `ids` no `useRef`) e `dados.salvar(tabela, dados, iniciais)` (os `iniciais` só valem se o registro não existe). ±2,5 lê o valor salvo mais recente (`dados.obter`) antes de somar. Teste em `dados.test.ts`.
+- Carga 0–1000 com vírgula; −2,5 não passa de 0. Botões com `touch-action: manipulation` (toque rápido não dá zoom).
 
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
@@ -131,5 +138,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 5.2 (marcar séries).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 5.3 (timer de descanso).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { cronometro, duracaoCurta, proximaFicha, semana, tempoMedio, treinoAberto } from './treino';
-import type { Ficha, Treino } from './tipos';
+import {
+  chaveSerie, cronometro, duracaoCurta, faixaReps, kg, proximaFicha, semana, tempoMedio, treinoAberto, ultimaVez, valoresIniciais,
+} from './treino';
+import type { Ficha, FichaSerie, Treino, TreinoSerie } from './tipos';
 
 const base = { user_id: 'u', criado_em: '2026-10-01T00:00:00Z', atualizado_em: '2026-10-01T00:00:00Z', excluido_em: null };
 const ficha = (id: string, ordem: number, ativa = true): Ficha => ({ ...base, id, nome: id, ordem, ativa });
@@ -70,6 +72,48 @@ describe('semana', () => {
   });
   it('domingo pertence à semana que começou na segunda anterior', () => {
     expect(semana([], new Date(2026, 9, 25, 12))[0].dia).toBe('2026-10-19');
+  });
+});
+
+describe('valores pré-preenchidos', () => {
+  const serieT = (treino_id: string, nome: string, n: number, carga: number | null, reps: number | null, feita = true): TreinoSerie => ({
+    ...base, id: `${treino_id}-${nome}-${n}`, treino_id, exercicio_nome: nome, serie_n: n, carga, reps, descanso_seg: null,
+    feita_em: feita ? '2026-10-20T10:10:00Z' : null,
+  });
+  const planejada = (n: number, min: number | null, max: number | null, carga: number | null): FichaSerie => ({
+    ...base, id: `p${n}`, ficha_exercicio_id: 'e', serie_n: n, reps_min: min, reps_max: max, carga_alvo: carga,
+  });
+  const t1 = treino('SupA', '2026-10-13T10:00:00Z', 3600);
+  const t2 = treino('SupA', '2026-10-20T10:00:00Z', 3600);
+  const t3 = treino('SupA', '2026-10-22T10:00:00Z', 3600); // finalizado sem nenhuma série marcada
+  const aberto = treino('SupA', '2026-10-24T10:00:00Z', null);
+  const series = [
+    serieT(t1.id, 'Supino', 1, 16, 10),
+    serieT(t2.id, 'Supino', 1, 18, 9),
+    serieT(t2.id, 'Supino', 2, 18, 8),
+    serieT(t2.id, 'Supino', 3, 20, 6, false), // não marcada: não conta
+    serieT(aberto.id, 'Supino', 1, 22, 5),
+  ];
+
+  it('última vez = o treino finalizado mais recente da ficha com série feita', () => {
+    const m = ultimaVez('SupA', [t1, t2, t3, aberto], series, aberto.id);
+    expect(m.get(chaveSerie('Supino', 1))).toEqual({ carga: 18, reps: 9 });
+    expect(m.get(chaveSerie('Supino', 2))).toEqual({ carga: 18, reps: 8 });
+    expect(m.has(chaveSerie('Supino', 3))).toBe(false);
+  });
+  it('sem última vez: alvo da ficha, reps pelo mínimo da faixa', () => {
+    const m = ultimaVez('SupA', [t1, t2], series, aberto.id);
+    expect(valoresIniciais('Supino', planejada(1, 8, 12, 20), m)).toEqual({ carga: 18, reps: 9 });
+    expect(valoresIniciais('Supino', planejada(3, 8, 12, 20), m)).toEqual({ carga: 20, reps: 8 });
+    expect(valoresIniciais('Prancha', planejada(1, null, null, null), m)).toEqual({ carga: null, reps: null });
+  });
+  it('outra ficha não conta', () => {
+    expect(ultimaVez('InfA', [t1, t2], series).size).toBe(0);
+  });
+  it('faixa de reps e carga', () => {
+    expect([faixaReps({ reps_min: 8, reps_max: 12 }), faixaReps({ reps_min: 15, reps_max: 15 }), faixaReps({ reps_min: null, reps_max: null })])
+      .toEqual(['8-12', '15', '']);
+    expect([kg(17.5), kg(20), kg(2.25)]).toEqual(['17,5', '20', '2,25']);
   });
 });
 

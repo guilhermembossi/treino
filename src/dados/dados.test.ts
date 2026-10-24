@@ -202,6 +202,20 @@ describe('camada local e sincronização', () => {
     d.fechar();
   });
 
+  it('valores iniciais só entram se o registro não existe (o ✓ logo depois de digitar não volta a carga)', async () => {
+    const s = new ServidorFalso();
+    const d = await aparelho(s);
+    const id = crypto.randomUUID();
+    const iniciais = { treino_id: 't', exercicio_nome: 'Supino', serie_n: 1, carga: 18, reps: 9, descanso_seg: null, feita_em: null };
+    // Saiu do campo de carga (22) e tocou no ✓ quase junto: as duas gravações começam antes de qualquer uma terminar.
+    await Promise.all([
+      d.salvar('treino_series', { id, carga: 22 }, iniciais),
+      d.salvar('treino_series', { id, feita_em: '2026-10-24T10:00:00Z' }, iniciais),
+    ]);
+    expect(await d.obter('treino_series', id)).toMatchObject({ carga: 22, reps: 9, feita_em: '2026-10-24T10:00:00Z', exercicio_nome: 'Supino' });
+    d.fechar();
+  });
+
   it('baixa só o que mudou desde a última vez', async () => {
     const s = new ServidorFalso();
     const a = await aparelho(s), b = await aparelho(s);

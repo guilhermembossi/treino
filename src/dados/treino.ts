@@ -1,4 +1,4 @@
-import type { Ficha, Treino } from './tipos';
+import type { Ficha, FichaSerie, Treino, TreinoSerie } from './tipos';
 
 // Regras do treino do dia (tarefa 5.1). Funções puras: recebem as listas e devolvem a resposta.
 
@@ -36,6 +36,46 @@ export function tempoMedio(fichaId: string, treinos: Treino[]): number | null {
   if (!ultimas.length) return null;
   return Math.round(ultimas.reduce((s, t) => s + t.duracao_seg!, 0) / ultimas.length);
 }
+
+// Série do treino é ligada ao exercício pelo nome + número (o histórico não depende da ficha).
+export const chaveSerie = (exercicioNome: string, serieN: number) => `${exercicioNome}|${serieN}`;
+
+export type Valores = { carga: number | null; reps: number | null };
+
+// O que foi feito na última vez dessa ficha (só séries marcadas), por exercício e série.
+// "Última vez" = o treino finalizado mais recente da ficha que tem alguma série feita, sem contar o atual.
+export function ultimaVez(fichaId: string | null, treinos: Treino[], series: TreinoSerie[], atualId?: string): Map<string, Valores> {
+  const feitas = series.filter((s) => s.feita_em);
+  const anterior = treinos
+    .filter((t) => t.ficha_id === fichaId && t.fim && t.id !== atualId)
+    .sort(recentesPrimeiro)
+    .find((t) => feitas.some((s) => s.treino_id === t.id));
+  const mapa = new Map<string, Valores>();
+  if (!anterior) return mapa;
+  for (const s of feitas.filter((x) => x.treino_id === anterior.id)) {
+    mapa.set(chaveSerie(s.exercicio_nome, s.serie_n), { carga: s.carga, reps: s.reps });
+  }
+  return mapa;
+}
+
+// Valores que já aparecem na linha da série: os da última vez; sem última vez, o alvo da ficha
+// (reps = o mínimo da faixa, para começar por algo alcançável).
+export function valoresIniciais(exercicioNome: string, planejada: FichaSerie, ultima: Map<string, Valores>): Valores {
+  const antes = ultima.get(chaveSerie(exercicioNome, planejada.serie_n));
+  if (antes) return antes;
+  return { carga: planejada.carga_alvo, reps: planejada.reps_min ?? planejada.reps_max };
+}
+
+// "8-12", "15", "" (sem alvo de reps).
+export function faixaReps(s: Pick<FichaSerie, 'reps_min' | 'reps_max'>): string {
+  const { reps_min: a, reps_max: b } = s;
+  if (a === null && b === null) return '';
+  if (a === null || b === null || a === b) return String(a ?? b);
+  return `${a}-${b}`;
+}
+
+// Carga com vírgula e sem zeros à toa: 17.5 → "17,5"; 20 → "20".
+export const kg = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
 
 // Dia no horário do aparelho, no formato 2026-10-24.
 export const diaLocal = (d: Date) =>
