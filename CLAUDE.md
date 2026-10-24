@@ -140,6 +140,11 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - **Salvar e sair** só volta ao Início (já foi salvo no Finalizar). **Voltar ao treino** reabre (`fim` e `duracao_seg` = null), só se não houver outro treino aberto.
 - Séries criadas e não marcadas ficam no banco com `feita_em` null (não contam em nada).
 
+## Histórico (tarefa 6.1, 24/10/2026)
+- `telas/Historico.tsx`: `#/historico` = calendário do mês (segunda a domingo, dias com treino finalizado em verde, hoje destacado, ‹ › para trocar de mês, sem avançar além do mês atual) + lista do mês ("Sáb 24/10 · Superior A · 13 min"). `#/historico/<id>` = detalhe: data, horário, duração, nº de séries, volume e uma tabela por exercício (série, carga, reps, descanso).
+- Regras em `dados/historico.ts` (testes em `historico.test.ts`): `treinosDoMes`, `gradeDoMes`, `dataCurta`, `seriesPorExercicio` (só séries marcadas; exercícios na ordem da ficha, os que não estão mais nela depois, na ordem em que foram feitos).
+- Só treinos **finalizados** aparecem. O mês escolhido fica guardado enquanto o app está aberto (`mesEscolhido`), para voltar do detalhe sem perder o mês.
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -152,5 +157,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi aprovada em 24/10/2026. A 5.4 (finalizar e resumo) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 6.1 (histórico).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi aprovada em 24/10/2026. A 5.4 (finalizar e resumo) foi aprovada em 24/10/2026. A 6.1 (histórico) foi publicada em 24/10/2026 e espera o teste do Guilherme. Depois: fase 7 (o Guilherme usa por uma semana e anota ajustes).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.
