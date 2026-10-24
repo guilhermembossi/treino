@@ -86,6 +86,11 @@ export class Dados {
     return salvo;
   }
 
+  // Vários de uma vez (ex.: nova ordem depois de arrastar), numa transação só.
+  async salvarVarios<T extends Tabela>(tabela: T, lista: Partial<Registros[T]>[]): Promise<void> {
+    if (lista.length) await this.gravar(tabela, lista);
+  }
+
   // Marca como excluído, junto com os filhos.
   async excluir(tabela: Tabela, id: string): Promise<void> {
     const quando = this.agora();

@@ -81,7 +81,6 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
   - Sem `code` no erro do Supabase = sem rede (tenta depois, estado "offline").
 - **Banco (migração `20261023235035_sincronizacao`):** `excluido_em` e `sincronizado_em` (hora do servidor, posta pelo gatilho `ao_gravar_sincronizacao`) nas 5 tabelas. O gatilho também ignora, sem erro, uma alteração com `atualizado_em` mais antigo que o gravado (a mais recente vale também no servidor). Função com `search_path` vazio e sem `execute` para os usuários.
 - Indicador no topo (`componentes/IndicadorSync.tsx`): Sincronizado / N pendentes / Sincronizando / Sem internet / Erro; tocar força a sincronização.
-- Fichas (`telas/Fichas.tsx`): versão simples (criar, renomear, excluir) só para testar a sincronização; a completa é a 4.1.
 - Testes: `npm test` (vitest + fake-indexeddb, `src/dados/dados.test.ts`, 10 casos com um servidor falso que segue as regras do Supabase). **O `npm run build` roda os testes**: publicação para se algum falhar. No banco: `testes/teste_sincronizacao.sql` (6 OK).
 - No iPhone o app instalado tem IndexedDB próprio, separado do Safari.
 - Classe com `private` no parâmetro do construtor não compila (`erasableSyntaxOnly`): declarar os campos.
@@ -93,6 +92,14 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - `main.tsx` registra só no build (`import.meta.env.PROD`) e chama `reg.update()` ao abrir e ao voltar para o app (o iPhone quase não procura sozinho). **Versão nova aparece na abertura seguinte**, não na mesma.
 - Sessão sem internet: com o acesso vencido (1 h), o `getSession` devolve "sem sessão" quando não consegue renovar. `useSessao` usa então a sessão guardada no aparelho (`sessaoGuardada`, chave `sb-<ref>-auth-token`), e o supabase-js renova sozinho quando a internet volta. Eventos sem sessão (que não são `SIGNED_OUT`) não tiram o usuário do app.
 - O navegador interno do Claude não aceita service worker ("unknown error when fetching the script"). Para testar, usar o Edge sem janela com `playwright-core` (fora do projeto): abrir, `setOffline(true)`, recarregar.
+
+## Fichas (tarefa 4.1, 24/10/2026)
+- `telas/Fichas.tsx`: lista em `#/fichas` (ordem = sequência dos treinos; "Nova ficha" cria "Nova ficha" e abre o editor com o nome selecionado, avisando por `sessionStorage` `ficha-nova`) e editor em `#/fichas/<id>` (`telas/EditorFicha.tsx`). `abaDoEndereco` no `App.tsx` aceita `#/fichas/...`.
+- Editor: nome; exercícios (nome, descanso em s, observação) e séries (reps mín/máx, carga alvo em kg com vírgula). Exercício novo = 90 s e 3 séries de 8–12 (`PADRAO`). "+ Série" copia a última. Mínimo > máximo: o outro acompanha (o banco recusaria). Excluir série renumera; excluir exercício/ficha pede confirmação.
+- `componentes/Campos.tsx` (`CampoTexto`, `CampoNumero`): salvam 0,6 s depois de parar de digitar e ao sair; inválido/fora do limite volta ao último salvo; não sobrescreve o que está sendo digitado quando a sincronização traz mudança. Limites iguais aos do banco.
+- `componentes/ListaOrdenavel.tsx` (dnd-kit 6.3.1/sortable 10.0.0, só `PointerSensor`): arrastar pela alça (`touch-action: none`). Teclado próprio: com a alça em foco, ↑ ↓ movem uma posição (o `KeyboardSensor` da biblioteca não movia cartões altos). `dados/ordem.ts` (`reordenar`, `renumerar`, `proximaOrdem`) devolve só o que mudou; grava com `dados.salvarVarios`.
+- **Modo demonstração** (`src/demo.tsx`): só no `npm run dev`, endereço `http://127.0.0.1:5173/treino/?demo` → app logado com usuário falso (`demo`) e servidor em memória (banco local `treino-dados-demo`). Não entra no build (conferir: `demo@exemplo` não aparece em `dist/assets`). `App.tsx` exporta `Casca` (o app logado) para isso.
+- Testar no navegador interno: o painel sem foco não dispara foco/saída de campo; disparar `focusin`/`focusout` à mão. O arrasto do painel (`left_click_drag`) não move itens do dnd-kit; simular com `PointerEvent` (`pointerdown` na alça, vários `pointermove` no `document`, `pointerup`).
 
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
@@ -106,5 +113,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 4.1 (fichas).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 4.2 (modelo Upper/Lower).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.

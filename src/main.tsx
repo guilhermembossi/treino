@@ -16,8 +16,11 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     .catch(() => { /* sem service worker o app só não abre offline */ });
 }
 
-createRoot(document.getElementById('raiz')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+const raiz = createRoot(document.getElementById('raiz')!);
+
+// ?demo só existe em desenvolvimento (ver src/demo.tsx); no build este trecho some.
+if (import.meta.env.DEV && new URLSearchParams(location.search).has('demo')) {
+  import('./demo').then(({ default: Demo }) => raiz.render(<StrictMode><Demo /></StrictMode>));
+} else {
+  raiz.render(<StrictMode><App /></StrictMode>);
+}

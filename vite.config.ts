@@ -86,5 +86,7 @@ function serviceWorker(): Plugin {
 
 export default defineConfig({
   base: BASE,
+  // Um arquivo só (~150 kB comprimido) que fica guardado no celular: o aviso padrão de 500 kB não ajuda.
+  build: { chunkSizeWarningLimit: 800 },
   plugins: [react(), marcaNoApp(), serviceWorker()],
 });

@@ -16,6 +16,28 @@ export const IconeFichas = () => (
   <svg {...props}><path d="M9 6h11M9 12h11M9 18h11" /><circle cx="4.5" cy="6" r="1" /><circle cx="4.5" cy="12" r="1" /><circle cx="4.5" cy="18" r="1" /></svg>
 );
 
+export const IconeAlca = () => (
+  <svg {...props} strokeWidth={0} fill="currentColor">
+    {[6, 12, 18].map((y) => [9, 15].map((x) => <circle key={`${x}-${y}`} cx={x} cy={y} r={1.6} />))}
+  </svg>
+);
+
+export const IconeSeta = () => (
+  <svg {...props}><path d="m9 6 6 6-6 6" /></svg>
+);
+
+export const IconeVoltar = () => (
+  <svg {...props}><path d="m15 6-6 6 6 6" /></svg>
+);
+
+export const IconeX = () => (
+  <svg {...props}><path d="M6 6l12 12M18 6 6 18" /></svg>
+);
+
+export const IconeMais = () => (
+  <svg {...props}><path d="M12 5v14M5 12h14" /></svg>
+);
+
 export const IconeLua = () => (
   <svg {...props}><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a6.5 6.5 0 0 0 11 11Z" /></svg>
 );

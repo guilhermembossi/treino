@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { marca } from '../config/marca';
 import { abrirBanco, Dados } from './dados';
 import { remotoSupabase } from './remoto';
-import type { EstadoSync, Registros, Tabela } from './tipos';
+import type { EstadoSync, Registros, Remoto, Tabela } from './tipos';
 
 const Contexto = createContext<Dados | null>(null);
 
@@ -10,7 +10,9 @@ const INTERVALO_MS = 60 * 1000;
 
 // Abre os dados do usuário logado (um banco local por usuário) e sincroniza:
 // ao abrir, ao voltar a internet, ao voltar para o app e a cada minuto.
-export function ProvedorDados({ userId, children }: { userId: string; children: ReactNode }) {
+export function ProvedorDados({ userId, remoto = remotoSupabase, children }: {
+  userId: string; remoto?: Remoto; children: ReactNode;
+}) {
   const [dados, setDados] = useState<Dados | null>(null);
 
   useEffect(() => {
@@ -18,7 +20,7 @@ export function ProvedorDados({ userId, children }: { userId: string; children: 
     let ativo = true;
     abrirBanco(`${marca.id}-dados-${userId}`).then((db) => {
       if (!ativo) { db.close(); return; }
-      d = new Dados(db, userId, remotoSupabase);
+      d = new Dados(db, userId, remoto);
       setDados(d);
       void d.sincronizar();
     });
@@ -35,7 +37,7 @@ export function ProvedorDados({ userId, children }: { userId: string; children: 
       document.removeEventListener('visibilitychange', sincronizar);
       d?.fechar();
     };
-  }, [userId]);
+  }, [userId, remoto]);
 
   if (!dados) return null;
   return <Contexto.Provider value={dados}>{children}</Contexto.Provider>;
