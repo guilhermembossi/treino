@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDados, useLista } from '../dados/contexto';
 import {
-  chaveSerie, cronometro, faixaReps, kg, treinoAberto, ultimaVez, valoresIniciais, type Valores,
+  chaveSerie, cronometro, faixaReps, kg, treinoAberto, ultimaMarcada, ultimaVez, valoresIniciais, type Valores,
 } from '../dados/treino';
 import type { FichaExercicio, FichaSerie, TreinoSerie } from '../dados/tipos';
 import { CampoNumero } from '../componentes/Campos';
+import { BarraDescanso, useDescanso } from '../componentes/Descanso';
 import { IconeCheck, IconeVoltar } from '../icones';
 
 const PASSO_KG = 2.5;
+const DESCANSO_PADRAO = 90; // exercício sem descanso definido
 
 // Treino em andamento (#/treino): um cartão por exercício e uma linha por série.
 // Carga e reps já vêm com o que foi feito da última vez nessa ficha (ou o alvo); cada mudança e cada
-// marcação salvam na hora (fechar o app não perde nada). Timer de descanso: 5.3. Finalizar: 5.4.
+// marcação salvam na hora (fechar o app não perde nada). Descansar abre o timer (5.3). Finalizar: 5.4.
 export default function Treino() {
   const dados = useDados();
   const treinos = useLista('treinos');
@@ -33,6 +35,7 @@ export default function Treino() {
     () => (treino && treinos && feitas ? ultimaVez(treino.ficha_id, treinos, feitas, treino.id) : new Map<string, Valores>()),
     [treino, treinos, feitas],
   );
+  const { descanso, comecar, ajustar, terminar } = useDescanso(treino?.id, agora);
 
   if (!treinos || !exercicios || !planejadas || !feitas) return null;
 
@@ -59,9 +62,13 @@ export default function Treino() {
 
   async function descartar() {
     if (!confirm(`Descartar o treino "${treino!.nome_ficha}"? Ele não vai para o histórico.`)) return;
+    terminar();
     await dados.excluir('treinos', treino!.id);
     location.hash = '#/';
   }
+
+  const descansar = (e: FichaExercicio) =>
+    comecar(e.nome, ultimaMarcada(feitas, treino.id, e.nome)?.id ?? null, e.descanso_seg ?? DESCANSO_PADRAO);
 
   return (
     <>
@@ -77,10 +84,16 @@ export default function Treino() {
       <ul className="lista lista-exercicios">
         {doTreino.map((e) => (
           <li key={e.id} className="cartao exercicio-treino">
-            <p className="item-nome quebra">{e.nome}</p>
-            <p className="fraco detalhe-exercicio">
-              {e.descanso_seg ? `Descanso ${e.descanso_seg} s` : 'Sem descanso definido'}
-            </p>
+            <div className="exercicio-cabeca">
+              <div>
+                <p className="item-nome quebra">{e.nome}</p>
+                <p className="fraco detalhe-exercicio">Descanso {e.descanso_seg ?? DESCANSO_PADRAO} s</p>
+              </div>
+              <button type="button" className="botao-descansar" onClick={() => descansar(e)}
+                aria-label={`Descansar ${e.descanso_seg ?? DESCANSO_PADRAO} segundos depois de ${e.nome}`}>
+                Descansar
+              </button>
+            </div>
             {e.observacao && <p className="fraco obs">{e.observacao}</p>}
 
             <div className="serie-treino serie-treino-cabecalho" aria-hidden="true">
@@ -91,7 +104,8 @@ export default function Treino() {
                 const chave = chaveSerie(e.nome, p.serie_n);
                 return (
                   <LinhaSerie key={p.id} id={idDe(chave)} treinoId={treino.id} exercicio={e.nome} planejada={p}
-                    registro={registros.get(chave)} iniciais={valoresIniciais(e.nome, p, ultima)} />
+                    registro={registros.get(chave)} iniciais={valoresIniciais(e.nome, p, ultima)}
+                    aoMarcar={() => terminar()} />
                 );
               })}
             </ol>
@@ -101,12 +115,19 @@ export default function Treino() {
       {doTreino.length === 0 && <p className="fraco vazio">Essa ficha não tem exercícios.</p>}
 
       <button type="button" className="botao-perigo" onClick={() => void descartar()}>Descartar treino</button>
+
+      {descanso && <>
+        <div className="espaco-descanso" aria-hidden="true" />
+        <BarraDescanso descanso={descanso} agora={agora} ajustar={ajustar} terminar={terminar} />
+      </>}
     </>
   );
 }
 
-function LinhaSerie({ id, treinoId, exercicio, planejada, registro, iniciais }: {
+// `aoMarcar`: marcar uma série encerra o descanso em andamento (o descanso real vai até aqui).
+function LinhaSerie({ id, treinoId, exercicio, planejada, registro, iniciais, aoMarcar }: {
   id: string; treinoId: string; exercicio: string; planejada: FichaSerie; registro: TreinoSerie | undefined; iniciais: Valores;
+  aoMarcar: () => void;
 }) {
   const dados = useDados();
   const n = planejada.serie_n;
@@ -145,7 +166,7 @@ function LinhaSerie({ id, treinoId, exercicio, planejada, registro, iniciais }: 
       </span>
       <button type="button" className="botao-marcar" aria-pressed={feita}
         aria-label={feita ? `${rotulo} feita. Tocar para desmarcar` : `Marcar ${rotulo.toLowerCase()} como feita`}
-        onClick={() => void salvar({ feita_em: feita ? null : new Date().toISOString() })}>
+        onClick={() => { if (!feita) aoMarcar(); void salvar({ feita_em: feita ? null : new Date().toISOString() }); }}>
         <IconeCheck />
       </button>
     </li>

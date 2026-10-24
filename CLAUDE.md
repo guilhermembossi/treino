@@ -126,6 +126,13 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - **Corrida campo × ✓** (sair do campo e marcar quase juntos): cada gravação manda só o que mudou, com o mesmo id (fixo por série, `ids` no `useRef`) e `dados.salvar(tabela, dados, iniciais)` (os `iniciais` só valem se o registro não existe). ±2,5 lê o valor salvo mais recente (`dados.obter`) antes de somar. Teste em `dados.test.ts`.
 - Carga 0–1000 com vírgula; −2,5 não passa de 0. Botões com `touch-action: manipulation` (toque rápido não dá zoom).
 
+## Timer de descanso (tarefa 5.3, 24/10/2026)
+- `componentes/Descanso.tsx`: `useDescanso` (estado guardado no aparelho em `localStorage` `treino-descanso`, sobrevive a fechar o app) e `BarraDescanso` (faixa fixa logo acima da barra de baixo, com contagem grande, −15 s, +15 s e Pular).
+- Regras puras em `dados/treino.ts`: `restanteDescanso`, `ajustarDescanso` (−15 não desce abaixo do que já passou; máx. 3600), `descansoReal`, `ultimaMarcada`.
+- Começa no botão **Descansar** do exercício (descanso do exercício; sem valor, 90 s). **Termina** no Pular/Fechar ou ao marcar qualquer série. Passou do zero: conta o tempo extra ("+0:12") e o botão vira Fechar. O **descanso real** (do toque até o fim) vai para `descanso_seg` da última série marcada daquele exercício (se não houver, não salva).
+- Aviso ao zerar (uma vez, `avisou`): `src/som.ts`, 3 bipes por Web Audio e `navigator.vibrate`. `prepararSom()` roda no toque em Descansar (o iPhone só libera áudio num toque) e põe `navigator.audioSession.type = 'transient'` (mistura com a música).
+- **Limites do iPhone:** não vibra (o Safari não tem a API), não toca com a tela bloqueada nem, provavelmente, no modo silencioso.
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -138,5 +145,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 5.3 (timer de descanso).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 5.4 (finalizar).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.

@@ -222,6 +222,61 @@ button { font: inherit; }
 .progresso { margin-top: 0.15rem !important; font-size: 0.85rem; }
 
 .exercicio-treino { padding: 0.75rem 0.6rem 0.5rem; }
+.exercicio-cabeca { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+.botao-descansar {
+  flex: none;
+  min-height: 40px;
+  padding: 0 0.85rem;
+  border: 1px solid var(--primaria);
+  border-radius: 999px;
+  background: none;
+  color: var(--primaria);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Timer de descanso: faixa fixa logo acima da barra de baixo */
+.espaco-descanso { height: 8.5rem; }
+.barra-descanso {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(57px + env(safe-area-inset-bottom));
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: var(--superficie);
+  border-top: 2px solid var(--primaria);
+  box-shadow: 0 -6px 20px rgb(0 0 0 / 0.12);
+}
+.barra-descanso p { margin: 0; }
+.descanso-info { min-width: 0; }
+.descanso-rotulo { font-size: 0.75rem; color: var(--textoFraco); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.descanso-tempo { font-size: 2.6rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--primaria); }
+.barra-descanso.passou { border-top-color: var(--sucesso); }
+.barra-descanso.passou .descanso-tempo { color: var(--sucesso); }
+.descanso-botoes { display: flex; gap: 0.35rem; flex: none; }
+.descanso-botoes button {
+  min-width: 3.3rem;
+  min-height: 48px;
+  padding: 0 0.5rem;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.descanso-botoes .principal { background: var(--primaria); border-color: var(--primaria); color: var(--sobrePrimaria); }
 .exercicio-treino p { margin: 0; }
 .item-nome.quebra { white-space: normal; }
 .detalhe-exercicio { font-size: 0.8rem; margin-top: 0.15rem !important; }

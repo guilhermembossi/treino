@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  chaveSerie, cronometro, duracaoCurta, faixaReps, kg, proximaFicha, semana, tempoMedio, treinoAberto, ultimaVez, valoresIniciais,
+  ajustarDescanso, chaveSerie, cronometro, descansoReal, duracaoCurta, faixaReps, kg, proximaFicha, restanteDescanso, semana,
+  tempoMedio, treinoAberto, ultimaMarcada, ultimaVez, valoresIniciais, type Descanso,
 } from './treino';
 import type { Ficha, FichaSerie, Treino, TreinoSerie } from './tipos';
 
@@ -114,6 +115,32 @@ describe('valores pré-preenchidos', () => {
     expect([faixaReps({ reps_min: 8, reps_max: 12 }), faixaReps({ reps_min: 15, reps_max: 15 }), faixaReps({ reps_min: null, reps_max: null })])
       .toEqual(['8-12', '15', '']);
     expect([kg(17.5), kg(20), kg(2.25)]).toEqual(['17,5', '20', '2,25']);
+  });
+});
+
+describe('descanso', () => {
+  const d: Descanso = { treinoId: 't', exercicio: 'Supino', serieId: 's1', inicio: 1_000_000, alvoSeg: 90 };
+  it('conta para trás e passa do zero', () => {
+    expect(restanteDescanso(d, 1_000_000 + 30_000)).toBe(60);
+    expect(restanteDescanso(d, 1_000_000 + 100_000)).toBe(-10);
+  });
+  it('+15 / −15 mudam o alvo, sem descer abaixo do que já passou', () => {
+    expect(ajustarDescanso(d, 15, 1_000_000).alvoSeg).toBe(105);
+    expect(ajustarDescanso(d, -15, 1_000_000).alvoSeg).toBe(75);
+    expect(ajustarDescanso(d, -15, 1_000_000 + 80_000).alvoSeg).toBe(80);
+    expect(ajustarDescanso({ ...d, alvoSeg: 3590 }, 15, 1_000_000).alvoSeg).toBe(3600);
+  });
+  it('descanso real = do início até agora, no limite do banco', () => {
+    expect(descansoReal(d, 1_000_000 + 134_400)).toBe(134);
+    expect(descansoReal(d, 1_000_000 + 5_000_000)).toBe(3600);
+  });
+  it('última série marcada do exercício', () => {
+    const s = (id: string, nome: string, feita: string | null): TreinoSerie => ({
+      ...base, id, treino_id: 't', exercicio_nome: nome, serie_n: 1, carga: 10, reps: 10, descanso_seg: null, feita_em: feita,
+    });
+    const series = [s('a', 'Supino', '2026-10-24T10:00:00Z'), s('b', 'Supino', '2026-10-24T10:05:00Z'), s('c', 'Supino', null), s('d', 'Remada', '2026-10-24T10:09:00Z')];
+    expect(ultimaMarcada(series, 't', 'Supino')?.id).toBe('b');
+    expect(ultimaMarcada(series, 't', 'Agachamento')).toBeUndefined();
   });
 });
 

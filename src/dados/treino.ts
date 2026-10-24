@@ -77,6 +77,32 @@ export function faixaReps(s: Pick<FichaSerie, 'reps_min' | 'reps_max'>): string 
 // Carga com vírgula e sem zeros à toa: 17.5 → "17,5"; 20 → "20".
 export const kg = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
 
+// Descanso em andamento (tarefa 5.3). Guardado no aparelho para sobreviver a fechar o app.
+// `serieId` = a última série marcada do exercício: é nela que o descanso real fica salvo.
+export type Descanso = {
+  treinoId: string; exercicio: string; serieId: string | null; inicio: number; alvoSeg: number;
+  avisou?: boolean; // já tocou o aviso de fim (não repete ao reabrir o app)
+};
+
+// Segundos que faltam (negativo = passou do tempo).
+export const restanteDescanso = (d: Descanso, agora: number) => d.alvoSeg - (agora - d.inicio) / 1000;
+
+// −15 s / +15 s mudam o alvo; nunca abaixo do que já passou (zera na hora).
+export function ajustarDescanso(d: Descanso, deltaSeg: number, agora: number): Descanso {
+  const passou = Math.ceil((agora - d.inicio) / 1000);
+  return { ...d, alvoSeg: Math.min(3600, Math.max(passou, d.alvoSeg + deltaSeg)) };
+}
+
+// Descanso real, em segundos, do toque em Descansar até agora (limite do banco: 3600).
+export const descansoReal = (d: Descanso, agora: number) => Math.min(3600, Math.max(0, Math.round((agora - d.inicio) / 1000)));
+
+// Última série marcada de um exercício no treino (a que vem antes do descanso).
+export function ultimaMarcada(series: TreinoSerie[], treinoId: string, exercicio: string): TreinoSerie | undefined {
+  return series
+    .filter((s) => s.treino_id === treinoId && s.exercicio_nome === exercicio && s.feita_em)
+    .sort((a, b) => b.feita_em!.localeCompare(a.feita_em!))[0];
+}
+
 // Dia no horário do aparelho, no formato 2026-10-24.
 export const diaLocal = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
