@@ -107,6 +107,18 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - A tela de Fichas oferece o modelo **só quando não há nenhuma ficha** (cartão "Começar com um modelo"). Grava numa transação por tabela.
 - Teste: `src/dados/modelo.test.ts` (4 fichas na ordem, 7/5/7/6 exercícios, séries e limites do banco).
 
+## Começar treino (tarefa 5.1, 24/10/2026)
+- Regras em `src/dados/treino.ts` (puras, testadas em `treino.test.ts`):
+  - `proximaFicha`: a seguinte (por `ordem`, só `ativa`) à do último treino **finalizado**; sem treino ou ficha apagada → a primeira; volta ao começo.
+  - `treinoAberto`: treino sem `fim` (o mais recente).
+  - `tempoMedio`: média das 3 últimas vezes finalizadas da ficha.
+  - `semana`: segunda a domingo no horário do aparelho, dias com treino finalizado.
+  - `META_SEMANAL` = 5 ("3 de 5").
+  - `cronometro` e `duracaoCurta`.
+- Início (`telas/Inicio.tsx`): "Olá, <nome>"; cartão "Próximo treino" (exercícios e "cerca de X min"), **Começar treino**, **Trocar ficha** (botões com as fichas ativas; vale só para começar agora); com treino aberto, o cartão vira "Continuar treino"; faixa da semana. Sem fichas → "Criar fichas".
+- Começar grava em `treinos` (`ficha_id`, `nome_ficha`, `inicio` do celular, `fim` null) e abre `#/treino` (`telas/Treino.tsx`; a aba Início fica marcada). O cronômetro conta a partir de `inicio` (certo mesmo com o app fechado).
+- Tela do treino na 5.1: ficha, cronômetro e lista dos exercícios. **Descartar treino** (confirmação, exclusão marcada) foi acrescentado para não deixar treino aberto enquanto não existe o Finalizar (5.4).
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -119,5 +131,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 5.1 (começar treino).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 5.2 (marcar séries).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.

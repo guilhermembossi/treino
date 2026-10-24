@@ -170,6 +170,56 @@ button { font: inherit; }
 @keyframes pulsar { 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) { .sync-sincronizando .sync-ponto { animation: none; } }
 
+/* Início */
+.cartao-treino { display: flex; flex-direction: column; gap: 0.25rem; }
+.cartao-treino p { margin: 0; }
+.cartao-treino .botao-primario { display: grid; place-items: center; margin-top: 0.75rem; text-decoration: none; }
+.cartao-treino > .link { align-self: center; }
+.treino-nome { font-size: 1.4rem; font-weight: 800; }
+.treino-exercicios { margin: 0.5rem 0 0; padding-left: 1.1rem; color: var(--textoFraco); font-size: 0.9rem; line-height: 1.5; }
+.trocar-ficha { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.trocar-ficha button {
+  min-height: 40px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  background: var(--fundo);
+  color: var(--texto);
+  font: inherit;
+  cursor: pointer;
+}
+.trocar-ficha button[aria-pressed='true'] { border-color: var(--primaria); color: var(--primaria); font-weight: 700; }
+
+.semana { margin-top: 1rem; }
+.semana-topo { display: flex; justify-content: space-between; align-items: baseline; }
+.semana-topo p { margin: 0; }
+.semana-total { color: var(--textoFraco); }
+.semana-total strong { color: var(--texto); font-size: 1.2rem; }
+.semana-dias { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.35rem; }
+.semana-dias li {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  max-width: 44px;
+  justify-self: center;
+  width: 100%;
+  border-radius: 50%;
+  border: 1px solid var(--borda);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--textoFraco);
+}
+.semana-dias li.treinou { background: var(--sucesso); border-color: var(--sucesso); color: var(--sobrePrimaria); }
+.semana-dias li.hoje { outline: 2px solid var(--primaria); outline-offset: 2px; }
+
+/* Treino em andamento */
+.treino-topo { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 1rem; }
+.treino-topo p { margin: 0; }
+.treino-titulo { margin: 0; }
+.cronometro { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--primaria); }
+.obs { font-style: italic; margin-top: 0.25rem; }
+.nota { font-size: 0.85rem; text-align: center; margin-top: 1rem; }
+
 /* Listas e alça de arrastar */
 .lista, .lista-series { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .lista-series { gap: 0.25rem; }
