@@ -195,6 +195,7 @@ button { font: inherit; }
 .dica-tela { font-size: 0.85rem; margin: -0.5rem 0 1rem; }
 
 /* Lista de fichas */
+.oferta-modelo .botao-primario { margin-top: 0.25rem; }
 .item-linha { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem 0.25rem 0.25rem; }
 .item-link {
   flex: 1;

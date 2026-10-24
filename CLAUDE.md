@@ -101,6 +101,12 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - **Modo demonstração** (`src/demo.tsx`): só no `npm run dev`, endereço `http://127.0.0.1:5173/treino/?demo` → app logado com usuário falso (`demo`) e servidor em memória (banco local `treino-dados-demo`). Não entra no build (conferir: `demo@exemplo` não aparece em `dist/assets`). `App.tsx` exporta `Casca` (o app logado) para isso.
 - Testar no navegador interno: o painel sem foco não dispara foco/saída de campo; disparar `focusin`/`focusout` à mão. O arrasto do painel (`left_click_drag`) não move itens do dnd-kit; simular com `PointerEvent` (`pointerdown` na alça, vários `pointermove` no `document`, `pointerup`).
 
+## Modelo Upper/Lower (tarefa 4.2, 24/10/2026)
+- `src/dados/modelo.ts` (`MODELO_UPPER_LOWER`, `carregarModelo`): copiado da nota do Obsidian `Treino/Treino - Rascunho Upper Lower.md` (23/10/2026). Se a nota mudar, atualizar à mão aqui.
+- Conversões: exercícios alternados viram dois, com "Alternar com…" na observação; "se não tiver", "cada perna", "até a falha" e o tempo da prancha vão para a observação (séries sem reps); descanso 150 s nos compostos e 90 s nos isolados; carga em branco; dia 5 fora.
+- A tela de Fichas oferece o modelo **só quando não há nenhuma ficha** (cartão "Começar com um modelo"). Grava numa transação por tabela.
+- Teste: `src/dados/modelo.test.ts` (4 fichas na ordem, 7/5/7/6 exercícios, séries e limites do banco).
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -113,5 +119,5 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 4.2 (modelo Upper/Lower).
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi publicada em 24/10/2026 e espera o teste do Guilherme. Próxima: 5.1 (começar treino).
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.

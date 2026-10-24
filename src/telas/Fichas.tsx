@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDados, useLista } from '../dados/contexto';
+import { carregarModelo, MODELO_UPPER_LOWER } from '../dados/modelo';
 import { proximaOrdem, reordenar } from '../dados/ordem';
 import ListaOrdenavel from '../componentes/ListaOrdenavel';
 import { IconeMais, IconeSeta } from '../icones';
@@ -26,6 +27,7 @@ function ListaFichas() {
   const dados = useDados();
   const fichas = useLista('fichas');
   const exercicios = useLista('ficha_exercicios');
+  const [carregando, setCarregando] = useState(false);
   if (!fichas || !exercicios) return null;
 
   const ordenadas = [...fichas].sort((a, b) => a.ordem - b.ordem || a.criado_em.localeCompare(b.criado_em));
@@ -43,7 +45,19 @@ function ListaFichas() {
       {ordenadas.length > 0 && <p className="fraco dica-tela">A ordem abaixo é a sequência dos treinos. Arraste pela alça para mudar.</p>}
 
       {ordenadas.length === 0
-        ? <p className="fraco vazio">Nenhuma ficha ainda.</p>
+        ? (
+          <section className="cartao oferta-modelo">
+            <p className="rotulo">Começar com um modelo</p>
+            <p>
+              Upper/Lower: {MODELO_UPPER_LOWER.map((f) => f.nome).join(', ')}, nessa sequência.
+              Dá para editar tudo depois.
+            </p>
+            <button type="button" className="botao-primario" disabled={carregando}
+              onClick={() => { setCarregando(true); void carregarModelo(dados).finally(() => setCarregando(false)); }}>
+              {carregando ? 'Carregando…' : 'Carregar modelo Upper/Lower'}
+            </button>
+          </section>
+        )
         : (
           <ListaOrdenavel
             itens={ordenadas}
