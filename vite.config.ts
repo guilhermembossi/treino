@@ -5,8 +5,9 @@ import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { marca, type Paleta } from './src/config/marca.ts';
 
-// Endereço no GitHub Pages: https://guilhermembossi.github.io/treino/
-const BASE = '/treino/';
+// Pasta do app no endereço. Cloudflare Pages (https://treino.pages.dev/) publica na raiz;
+// o GitHub Pages antigo (https://guilhermembossi.github.io/treino/) passa BASE=/treino/ no build.
+const BASE = process.env.BASE ?? '/';
 
 const variaveis = (p: Paleta) =>
   Object.entries(p).map(([k, v]) => `--${k}:${v}`).join(';');
