@@ -30,7 +30,7 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 | Tela | React + Vite + TypeScript, PWA |
 | Dados no celular | IndexedDB, fila de sincronização (vale a alteração mais recente, `atualizado_em`) |
 | Banco + login | Supabase `app-treino` (id `ptxlgdbbycqwidpyywam`, São Paulo `sa-east-1`, plano grátis), e-mail e senha |
-| Hospedagem | GitHub Pages, publicação por GitHub Actions |
+| Hospedagem | Cloudflare Pages `treino-gb` (https://treino-gb.pages.dev/), publica sozinho a cada envio para a `main` |
 | Código | GitHub `guilhermembossi/treino` (público), pasta local `C:\projetos\app-treino` |
 
 ## Ambiente (tarefa 0.1, 23/10/2026)
@@ -46,19 +46,18 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - RLS: 4 políticas por tabela (ler, criar, alterar, apagar), só para `authenticated` e só do dono. Nas filhas, criar e alterar também exigem que o pai seja do usuário. O `anon` não tem nenhuma permissão nas tabelas.
 
 ## App (tarefa 2.1, 23/10/2026)
-- Endereço: https://guilhermembossi.github.io/treino/ (GitHub Pages, `base` = `/treino/` no `vite.config.ts`).
-- Publicação: `.github/workflows/publicar.yml` a cada envio para a `main` (ou "Run workflow"). Pages com origem "GitHub Actions".
+- Endereço desde a tarefa 8.1: https://treino-gb.pages.dev/ (ver "Endereço novo" abaixo). Até a 8.1 era o GitHub Pages.
 - Versões fixas (`--save-exact`): React 19.3.1, Vite 8.3.5, plugin-react 6.1.2, TypeScript 5.9.3 (a 7.0 era nova demais), sharp 0.35.5 (só para os ícones).
 - **Marca:** `src/config/marca.ts` tem nome, descrição, idioma, as duas paletas (claro/escuro) e o logo (`logoSvg`). O plugin `marcaNoApp` do `vite.config.ts` põe isso no `index.html` (`%NOME%` etc., variáveis CSS dos temas e o script que aplica o tema antes de desenhar) e gera o `manifest.webmanifest`. Ícones em `public/icones/` saem de `npm run icones` (`scripts/gerar_icones.mjs`, que o Node lê o `.ts` direto: no `marca.ts` só sintaxe que pode ser apagada, sem enum).
 - CSS usa só as variáveis (`var(--primaria)` etc.); nenhuma cor escrita fora do `marca.ts`.
 - **Tema** (`src/tema.ts`): sem escolha, segue o aparelho; o sol/lua (`aria-label` "Mudar para tema claro/escuro") guarda a escolha em `localStorage` `treino-tema` e pinta a barra de status (`theme-color`).
 - **Navegação** pelo `#` do endereço (`#/`, `#/historico`, `#/fichas`): funciona no Pages sem configuração e o voltar do celular volta de aba. Telas em `src/telas/`.
-- Testar local: `npm run build` e `npx vite preview --port 4173 --host 127.0.0.1` → http://127.0.0.1:4173/treino/ (use 127.0.0.1, não localhost).
+- Testar local: `npm run build` e `npx vite preview --port 4173 --host 127.0.0.1` → http://127.0.0.1:4173/ (use 127.0.0.1, não localhost).
 - Ainda sem service worker (tarefa 3.2).
 
 ## Login (tarefa 1.3, 23/10/2026)
 - Supabase Auth com e-mail e senha, confirmação por e-mail obrigatória, senha mínima de 8, sem anônimo nem outros provedores.
-- Site URL `https://guilhermembossi.github.io/treino/`. Redirect URLs: `https://guilhermembossi.github.io/treino/**` e `http://127.0.0.1:4173/treino/**` (teste local). No app, mandar `emailRedirectTo`/`redirectTo` para o endereço atual dentro dessas.
+- Site URL `https://treino-gb.pages.dev/` (desde a 8.1). Redirect URLs: `https://treino-gb.pages.dev/**` e `http://127.0.0.1:4173/**` (teste local). No app, mandar `emailRedirectTo`/`redirectTo` para o endereço atual dentro dessas.
 - O que dá para conferir sem conta: `GET /auth/v1/settings` com a chave publicável (`external.email`, `disable_signup`, `mailer_autoconfirm`). Site URL e senha mínima só pelo painel ou criando conta.
 - E-mail grátis do Supabase: só para os e-mails da equipe do projeto e com limite por hora. Para outras pessoas, configurar SMTP próprio. Os modelos de e-mail vêm em inglês.
 
@@ -98,7 +97,7 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - Editor: nome; exercícios (nome, descanso em s, observação) e séries (reps mín/máx, carga alvo em kg com vírgula). Exercício novo = 90 s e 3 séries de 8–12 (`PADRAO`). "+ Série" copia a última. Mínimo > máximo: o outro acompanha (o banco recusaria). Excluir série renumera; excluir exercício/ficha pede confirmação.
 - `componentes/Campos.tsx` (`CampoTexto`, `CampoNumero`): salvam 0,6 s depois de parar de digitar e ao sair; inválido/fora do limite volta ao último salvo; não sobrescreve o que está sendo digitado quando a sincronização traz mudança. Limites iguais aos do banco.
 - `componentes/ListaOrdenavel.tsx` (dnd-kit 6.3.1/sortable 10.0.0, só `PointerSensor`): arrastar pela alça (`touch-action: none`). Teclado próprio: com a alça em foco, ↑ ↓ movem uma posição (o `KeyboardSensor` da biblioteca não movia cartões altos). `dados/ordem.ts` (`reordenar`, `renumerar`, `proximaOrdem`) devolve só o que mudou; grava com `dados.salvarVarios`.
-- **Modo demonstração** (`src/demo.tsx`): só no `npm run dev`, endereço `http://127.0.0.1:5173/treino/?demo` → app logado com usuário falso (`demo`) e servidor em memória (banco local `treino-dados-demo`). Não entra no build (conferir: `demo@exemplo` não aparece em `dist/assets`). `App.tsx` exporta `Casca` (o app logado) para isso.
+- **Modo demonstração** (`src/demo.tsx`): só no `npm run dev`, endereço `http://127.0.0.1:5173/?demo` → app logado com usuário falso (`demo`) e servidor em memória (banco local `treino-dados-demo`). Não entra no build (conferir: `demo@exemplo` não aparece em `dist/assets`). `App.tsx` exporta `Casca` (o app logado) para isso.
 - Testar no navegador interno: o painel sem foco não dispara foco/saída de campo; disparar `focusin`/`focusout` à mão. O arrasto do painel (`left_click_drag`) não move itens do dnd-kit; simular com `PointerEvent` (`pointerdown` na alça, vários `pointermove` no `document`, `pointerup`).
 
 ## Modelo Upper/Lower (tarefa 4.2, 24/10/2026)
@@ -145,6 +144,13 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - Regras em `dados/historico.ts` (testes em `historico.test.ts`): `treinosDoMes`, `gradeDoMes`, `dataCurta`, `seriesPorExercicio` (só séries marcadas; exercícios na ordem da ficha, os que não estão mais nela depois, na ordem em que foram feitos).
 - Só treinos **finalizados** aparecem. O mês escolhido fica guardado enquanto o app está aberto (`mesEscolhido`), para voltar do detalhe sem perder o mês.
 
+## Endereço novo: Cloudflare Pages (tarefa 8.1, 27/10/2026)
+- Projeto Cloudflare Pages `treino-gb` (conta do Guilherme), ligado ao GitHub pela integração do Cloudflare (acesso só ao repositório `treino`). Produção = branch `main`; publica sozinho a cada envio. Configuração no painel: framework None, build `npm run build`, saída `dist`, sem variáveis. Node 24 pelo `.node-version`.
+- `treino.pages.dev` já era de outro site; o Guilherme escolheu `treino-gb`. O endereço fica em `marca.endereco` (`marca.ts`).
+- `vite.config.ts`: `BASE` vem da variável de ambiente `BASE`, padrão `/` (raiz). No Git Bash, `BASE=/treino/` vira caminho do Windows: usar `MSYS_NO_PATHCONV=1`.
+- **Endereço antigo** (`guilhermembossi.github.io/treino/`): `.github/workflows/publicar.yml` não publica mais o app; publica só o aviso gerado por `scripts/gerar_aviso.mjs` (pasta `aviso/`, fora do git): `index.html` e `404.html` com o endereço novo, e um `sw.js` que apaga as cópias guardadas e desliga o service worker do app antigo. Roda só quando mudam `marca.ts`, o script ou o workflow.
+- O app instalado fica preso ao endereço: trocar de endereço = reinstalar no iPhone (dados voltam pela sincronização; antes, conferir "Sincronizado").
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -157,6 +163,6 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi aprovada em 24/10/2026. A 5.4 (finalizar e resumo) foi aprovada em 24/10/2026. A 6.1 (histórico) foi aprovada em 24/10/2026: **todas as tarefas de código da V1 feitas**. Em andamento: fase 7 (o Guilherme usa por uma semana e anota ajustes). Os treinos de teste foram marcados como excluídos no Supabase em 24/10/2026; ficaram as 4 fichas do modelo.
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi aprovada em 24/10/2026. A 5.4 (finalizar e resumo) foi aprovada em 24/10/2026. A 6.1 (histórico) foi aprovada em 24/10/2026: **todas as tarefas de código da V1 feitas**. Em andamento: fase 7 (o Guilherme usa por uma semana e anota ajustes). Fase 8: a 8.1 (endereço novo `treino-gb.pages.dev`, app reinstalado no iPhone com os dados de volta) foi feita em 27/10/2026. Os treinos de teste foram marcados como excluídos no Supabase em 24/10/2026; ficaram as 4 fichas do modelo.
 - Apagar dado pelo SQL (a pedido do Guilherme): sempre exclusão marcada, `excluido_em = now()` **e** `atualizado_em = now()`, no pai e nos filhos. Assim a mudança chega ao celular e vence a versão local.
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.
