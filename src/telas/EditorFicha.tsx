@@ -32,7 +32,7 @@ export default function EditorFicha({ id }: { id: string }) {
     return (
       <>
         <Voltar />
-        <p className="fraco vazio">Essa ficha não existe mais.</p>
+        <p className="fraco vazio">Este treino não existe mais.</p>
       </>
     );
   }
@@ -50,7 +50,7 @@ export default function EditorFicha({ id }: { id: string }) {
   }
 
   async function excluirFicha() {
-    if (!confirm(`Excluir a ficha "${ficha!.nome}" com todos os exercícios?`)) return;
+    if (!confirm(`Excluir o treino "${ficha!.nome}" com todos os exercícios?`)) return;
     await dados.excluir('fichas', id);
     location.hash = '#/fichas';
   }
@@ -58,7 +58,7 @@ export default function EditorFicha({ id }: { id: string }) {
   return (
     <>
       <Voltar />
-      <CampoTexto className="campo-titulo" valor={ficha.nome} obrigatorio maxLength={100} aria-label="Nome da ficha"
+      <CampoTexto className="campo-titulo" valor={ficha.nome} obrigatorio maxLength={100} aria-label="Nome do treino"
         selecionar={fichaNova} aoSalvar={(nome) => void dados.salvar('fichas', { id, nome: nome! })} />
 
       {daFicha.length === 0
@@ -79,13 +79,13 @@ export default function EditorFicha({ id }: { id: string }) {
       <button type="button" className="botao-secundario" onClick={() => void adicionarExercicio()}>
         <IconeMais /> Adicionar exercício
       </button>
-      <button type="button" className="botao-perigo" onClick={() => void excluirFicha()}>Excluir ficha</button>
+      <button type="button" className="botao-perigo" onClick={() => void excluirFicha()}>Excluir treino</button>
     </>
   );
 }
 
 function Voltar() {
-  return <a className="voltar" href="#/fichas"><IconeVoltar /> Fichas</a>;
+  return <a className="voltar" href="#/fichas"><IconeVoltar /> Treinos</a>;
 }
 
 function CartaoExercicio({ exercicio: e, series, alca, novo }: {

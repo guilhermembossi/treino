@@ -52,7 +52,7 @@ export default function ResumoTreino({ id }: { id: string }) {
       <section className="cartao mudancas">
         <p className="rotulo">Desde a última vez</p>
         {r.primeiraVez
-          ? <p className="fraco">Primeira vez com esta ficha. Na próxima, aparece aqui o que mudou.</p>
+          ? <p className="fraco">Primeira vez com este treino. Na próxima, aparece aqui o que mudou.</p>
           : r.mudancas.length === 0
             ? <p className="fraco">Mesmas cargas e repetições da última vez.</p>
             : (

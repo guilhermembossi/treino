@@ -128,7 +128,7 @@ export default function Treino() {
           </li>
         ))}
       </ul>
-      {doTreino.length === 0 && <p className="fraco vazio">Essa ficha não tem exercícios.</p>}
+      {doTreino.length === 0 && <p className="fraco vazio">Este treino não tem exercícios.</p>}
 
       <button type="button" className="botao-perigo" onClick={() => void descartar()}>Descartar treino</button>
 

@@ -193,8 +193,8 @@ button { font: inherit; }
 .cartao-treino > .link { align-self: center; }
 .treino-nome { font-size: 1.4rem; font-weight: 800; }
 .treino-exercicios { margin: 0.5rem 0 0; padding-left: 1.1rem; color: var(--textoFraco); font-size: 0.9rem; line-height: 1.5; }
-.trocar-ficha { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
-.trocar-ficha button {
+.trocar-treino { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.trocar-treino button {
   min-height: 40px;
   padding: 0 0.9rem;
   border: 1px solid var(--borda);
@@ -204,7 +204,7 @@ button { font: inherit; }
   font: inherit;
   cursor: pointer;
 }
-.trocar-ficha button[aria-pressed='true'] { border-color: var(--primaria); color: var(--primaria); font-weight: 700; }
+.trocar-treino button[aria-pressed='true'] { border-color: var(--primaria); color: var(--primaria); font-weight: 700; }
 
 .semana { margin-top: 1rem; }
 .semana-topo { display: flex; justify-content: space-between; align-items: baseline; }

@@ -19,7 +19,7 @@ export const marca = {
   id: 'treino', // prefixo das chaves guardadas no aparelho
   nome: 'Treino',
   nomeCurto: 'Treino',
-  descricao: 'Ficha de treino, séries, descanso e histórico.',
+  descricao: 'Seus treinos, séries, descanso e histórico.',
   idioma: 'pt-BR',
   endereco: 'https://treino-gb.pages.dev/', // endereço do app publicado (Cloudflare Pages)
   cores: {

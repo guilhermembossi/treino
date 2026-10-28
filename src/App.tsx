@@ -23,7 +23,7 @@ type Aba = 'inicio' | 'historico' | 'fichas';
 const ABAS: { id: Aba; rota: string; nome: string; icone: () => ReactNode; tela: (s: Session) => ReactNode }[] = [
   { id: 'inicio', rota: '#/', nome: 'Início', icone: IconeInicio, tela: (s) => <Inicio sessao={s} /> },
   { id: 'historico', rota: '#/historico', nome: 'Histórico', icone: IconeHistorico, tela: () => <Historico /> },
-  { id: 'fichas', rota: '#/fichas', nome: 'Fichas', icone: IconeFichas, tela: () => <Fichas /> },
+  { id: 'fichas', rota: '#/fichas', nome: 'Treinos', icone: IconeFichas, tela: () => <Fichas /> },
 ];
 
 const abaDoEndereco = (): Aba =>

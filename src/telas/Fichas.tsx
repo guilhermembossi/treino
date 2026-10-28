@@ -34,14 +34,14 @@ function ListaFichas() {
   const nExercicios = (fichaId: string) => exercicios.filter((e) => e.ficha_id === fichaId).length;
 
   async function nova() {
-    const f = await dados.salvar('fichas', { nome: 'Nova ficha', ordem: proximaOrdem(ordenadas), ativa: true });
+    const f = await dados.salvar('fichas', { nome: 'Novo treino', ordem: proximaOrdem(ordenadas), ativa: true });
     sessionStorage.setItem('ficha-nova', f.id);
     location.hash = `${ROTA}/${f.id}`;
   }
 
   return (
     <>
-      <h1>Fichas</h1>
+      <h1>Treinos</h1>
       {ordenadas.length > 0 && <p className="fraco dica-tela">A ordem abaixo é a sequência dos treinos. Arraste pela alça para mudar.</p>}
 
       {ordenadas.length === 0
@@ -77,7 +77,7 @@ function ListaFichas() {
         )}
 
       <button type="button" className="botao-secundario" onClick={() => void nova()}>
-        <IconeMais /> Nova ficha
+        <IconeMais /> Novo treino
       </button>
     </>
   );

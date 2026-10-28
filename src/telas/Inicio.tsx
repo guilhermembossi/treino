@@ -67,10 +67,10 @@ export default function Inicio({ sessao }: { sessao: Session }) {
             Começar treino
           </button>
           <button type="button" className="link" aria-expanded={trocando} onClick={() => setTrocando(!trocando)}>
-            Trocar ficha
+            Trocar treino
           </button>
           {trocando && (
-            <ul className="trocar-ficha" aria-label="Escolher outra ficha">
+            <ul className="trocar-treino" aria-label="Escolher outro treino">
               {fichas.filter((f) => f.ativa).sort((a, b) => a.ordem - b.ordem).map((f) => (
                 <li key={f.id}>
                   <button type="button" aria-pressed={f.id === ficha.id}
@@ -85,8 +85,8 @@ export default function Inicio({ sessao }: { sessao: Session }) {
       ) : (
         <section className="cartao cartao-treino">
           <p className="rotulo">Próximo treino</p>
-          <p>Você ainda não tem fichas.</p>
-          <a className="botao-primario" href="#/fichas">Criar fichas</a>
+          <p>Você ainda não tem treinos.</p>
+          <a className="botao-primario" href="#/fichas">Criar treinos</a>
         </section>
       )}
 
