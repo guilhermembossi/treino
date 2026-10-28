@@ -21,6 +21,7 @@ export const marca = {
   nomeCurto: 'Treino',
   descricao: 'Ficha de treino, séries, descanso e histórico.',
   idioma: 'pt-BR',
+  endereco: 'https://treino-gb.pages.dev/', // endereço do app publicado (Cloudflare Pages)
   cores: {
     claro: {
       fundo: '#f4f6f6',
