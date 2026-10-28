@@ -4,6 +4,7 @@ import { enderecoDoApp, erroDoLink, mensagemDeErro, supabase } from '../supabase
 import Logo from '../componentes/Logo';
 import BotaoTema from '../componentes/BotaoTema';
 import FaixaSandbox from '../componentes/FaixaSandbox';
+import { MENSAGEM_SENHA_VAZADA, senhaVazada } from '../senhaVazada';
 
 type Modo = 'entrar' | 'criar' | 'esqueci' | 'nova-senha';
 
@@ -26,6 +27,11 @@ export default function Acesso({ novaSenha = false, aoTrocarSenha }: { novaSenha
     setAviso(null);
     setEnviando(true);
     try {
+      // Senha nova (criar conta ou trocar): recusa a que já apareceu em vazamentos (tarefa 8.3).
+      if ((modo === 'criar' || modo === 'nova-senha') && await senhaVazada(senha)) {
+        setErro(MENSAGEM_SENHA_VAZADA);
+        return;
+      }
       if (modo === 'entrar') {
         const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
         if (error) throw error;
