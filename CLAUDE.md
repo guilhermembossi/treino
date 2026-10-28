@@ -20,6 +20,7 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
   - **Exceção conhecida (23/10/2026, decisão do Guilherme):** "Leaked Password Protection Disabled" (recurso do plano Pro). Qualquer outro aviso tem que ser resolvido. Pendência antes de outras pessoas usarem: conferir a senha na base Pwned Passwords pelo app (ver "Antes de outras pessoas usarem" no `tarefas.md`).
 - Nome, cores e logo só em `src/config/marca.ts` (white label), nunca espalhados no código.
 - Textos da tela em português. Telas seguem a seção "Telas (V1)" da `arquitetura.md`.
+- **Sandbox primeiro (desde a 8.2, 27/10/2026):** toda mudança de código vai para a branch `sandbox` (publica em https://sandbox.treino-gb.pages.dev/) e toda migração vai primeiro para o schema `sandbox`. O Guilherme testa lá; só com o OK dele a `main` avança (`git merge --ff-only sandbox`) e a migração é repetida no `public`. Ver "Sandbox e produção".
 - Ao fim de cada tarefa: atualizar este `CLAUDE.md`, o "Já feito" da `arquitetura.md` e o status no `tarefas.md`.
 - Documentação do projeto só no Obsidian. Código só no Claude Code.
 - Commits com o e-mail privado do GitHub (`346195156+guilhermembossi@users.noreply.github.com`, configurado só neste repositório).
@@ -29,8 +30,8 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 |---|---|
 | Tela | React + Vite + TypeScript, PWA |
 | Dados no celular | IndexedDB, fila de sincronização (vale a alteração mais recente, `atualizado_em`) |
-| Banco + login | Supabase `app-treino` (id `ptxlgdbbycqwidpyywam`, São Paulo `sa-east-1`, plano grátis), e-mail e senha |
-| Hospedagem | Cloudflare Pages `treino-gb` (https://treino-gb.pages.dev/), publica sozinho a cada envio para a `main` |
+| Banco + login | Supabase `app-treino` (id `ptxlgdbbycqwidpyywam`, São Paulo `sa-east-1`, plano grátis), e-mail e senha. Produção no schema `public`, sandbox no schema `sandbox` |
+| Hospedagem | Cloudflare Pages `treino-gb`: `main` → https://treino-gb.pages.dev/ (produção), `sandbox` → https://sandbox.treino-gb.pages.dev/ |
 | Código | GitHub `guilhermembossi/treino` (público), pasta local `C:\projetos\app-treino` |
 
 ## Ambiente (tarefa 0.1, 23/10/2026)
@@ -151,6 +152,18 @@ Fica no Obsidian, não neste repositório: `C:\Users\Guilherme Bossi\OneDrive\Do
 - **Endereço antigo** (`guilhermembossi.github.io/treino/`): `.github/workflows/publicar.yml` não publica mais o app; publica só o aviso gerado por `scripts/gerar_aviso.mjs` (pasta `aviso/`, fora do git): `index.html` e `404.html` com o endereço novo, e um `sw.js` que apaga as cópias guardadas e desliga o service worker do app antigo. Roda só quando mudam `marca.ts`, o script ou o workflow.
 - O app instalado fica preso ao endereço: trocar de endereço = reinstalar no iPhone (dados voltam pela sincronização; antes, conferir "Sincronizado").
 
+## Sandbox e produção (tarefa 8.2, 27/10/2026)
+- O Supabase grátis dá **2 projetos por pessoa, somando todas as organizações**, e os 2 do Guilherme já estão em uso (`app-treino` e `controle-financeiro-mercado`). Por isso o sandbox é o **schema `sandbox`** dentro do `app-treino` (decisão do Guilherme, opção A), não um projeto à parte.
+- Migração `20261028001418_sandbox`: cópia das migrações anteriores com `public.` → `sandbox.` (mesmas tabelas, RLS, políticas, gatilho próprio `sandbox.ao_gravar_sincronizacao`). Num schema novo o Supabase não dá permissões: usage e CRUD só para `authenticated` (e `service_role`); `anon` nada.
+- O schema está em **Exposed schemas** (Data API) e `https://sandbox.treino-gb.pages.dev/**` nas Redirect URLs (feito pelo Guilherme no painel).
+- Compartilhado entre os dois: login (`auth.users`, a mesma conta), configurações de e-mail e Auth. Separado: os dados de treino.
+- **Migração nova:** primeiro `<versão>_<nome>` com `sandbox.` (aplicar só no schema sandbox), testar, e depois do OK a mesma com `public.`. Os dois schemas têm que continuar iguais (conferir tabelas, políticas e gatilhos nos dois).
+- **App:** `vite.config.ts` decide o ambiente pela branch (`CF_PAGES_BRANCH`): `main` = produção; outra branch e o build no PC = sandbox (`AMBIENTE=producao|sandbox` força). Vai como `import.meta.env.VITE_AMBIENTE`; `config/supabase.ts` exporta `SANDBOX`, `ESQUEMA` e `VERSAO`; o cliente usa `db: { schema: ESQUEMA }`. O build de produção não leva o código do sandbox (a faixa some no build).
+- No sandbox: faixa "SANDBOX · dados de teste" no topo e no login (`componentes/FaixaSandbox.tsx`, cor `--erro`) e banco local `treino-sandbox-dados-<user>`. Produção mantém `treino-dados-<user>`.
+- Rodapé do Início: "versão <commit>" (`CF_PAGES_COMMIT_SHA`, 7 letras; "local" no PC), com " · sandbox" no sandbox. Serve para conferir qual versão está em cada endereço.
+- Conferir o schema publicado: no JS de cada endereço, o valor passado em `db:{schema:…}` (`public` na produção, `sandbox` no sandbox).
+- Testes: `teste_dois_usuarios.sql` e `teste_sincronizacao.sql` rodam também no sandbox trocando `public.` por `sandbox.`; `teste_visitante.ps1 -Esquema sandbox`. **Neste PC o Windows bloqueia `.ps1`** (a liberação foi negada em 27/10/2026): as mesmas 20 tentativas foram feitas com `curl` e os cabeçalhos `Accept-Profile`/`Content-Profile`.
+
 ## Testes de segurança (tarefa 1.2, 23/10/2026)
 Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advisors` security: tem que dar zero).
 - `testes/teste_visitante.ps1`: o visitante tenta, pela API pública com a chave publicável, ler, criar, alterar e apagar nas 5 tabelas. Esperado: 20 de 20 recusados (HTTP 401). Rodar com `powershell -File testes\teste_visitante.ps1`. Tabela nova: incluir em `$novos`, com um corpo válido para ela.
@@ -163,6 +176,6 @@ Rodar depois de toda mudança de banco, junto com o Security Advisor (`get_advis
 - No iPhone o timer não toca som com a tela bloqueada (limite do Safari).
 
 ## Status
-- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi aprovada em 24/10/2026. A 5.4 (finalizar e resumo) foi aprovada em 24/10/2026. A 6.1 (histórico) foi aprovada em 24/10/2026: **todas as tarefas de código da V1 feitas**. Em andamento: fase 7 (o Guilherme usa por uma semana e anota ajustes). Fase 8: a 8.1 (endereço novo `treino-gb.pages.dev`, app reinstalado no iPhone com os dados de volta) foi aprovada em 27/10/2026. Os treinos de teste foram marcados como excluídos no Supabase em 24/10/2026; ficaram as 4 fichas do modelo.
+- 0.1 (ambiente), 0.2 (repositório e este arquivo), 1.1 (tabelas), 1.2 (teste de segurança), 2.1 (esqueleto e publicação), 1.3 (login no painel) e 2.2 (telas de login) feitas em 23/10/2026. A 2.2 foi aprovada depois que o Guilherme criou a conta no celular. A 2.3 (instalado no iPhone, abre em tela cheia, login ok) foi feita em 23/10/2026. A 3.1 (dados no celular e sincronização) foi aprovada em 24/10/2026. A 3.2 (abrir sem internet) foi aprovada em 24/10/2026. A 4.1 (fichas) foi aprovada em 24/10/2026. A 4.2 (modelo Upper/Lower) foi aprovada em 24/10/2026. A 5.1 (começar treino) foi aprovada em 24/10/2026. A 5.2 (marcar séries) foi aprovada em 24/10/2026. A 5.3 (timer de descanso) foi aprovada em 24/10/2026. A 5.4 (finalizar e resumo) foi aprovada em 24/10/2026. A 6.1 (histórico) foi aprovada em 24/10/2026: **todas as tarefas de código da V1 feitas**. Em andamento: fase 7 (o Guilherme usa por uma semana e anota ajustes). Fase 8: a 8.1 (endereço novo `treino-gb.pages.dev`, app reinstalado no iPhone com os dados de volta) foi aprovada em 27/10/2026. A 8.2 (sandbox no schema `sandbox`, branch `sandbox`) foi feita em 27/10/2026 e espera o OK. Os treinos de teste foram marcados como excluídos no Supabase em 24/10/2026; ficaram as 4 fichas do modelo.
 - Apagar dado pelo SQL (a pedido do Guilherme): sempre exclusão marcada, `excluido_em = now()` **e** `atualizado_em = now()`, no pai e nos filhos. Assim a mudança chega ao celular e vence a versão local.
 - No iPhone, o app instalado tem armazenamento próprio (login e `localStorage`/IndexedDB separados do Safari). Links de e-mail abrem no Safari.
