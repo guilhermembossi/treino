@@ -9,6 +9,13 @@ import { marca, type Paleta } from './src/config/marca.ts';
 // o GitHub Pages antigo (https://guilhermembossi.github.io/treino/) passa BASE=/treino/ no build.
 const BASE = process.env.BASE ?? '/';
 
+// Ambiente (tarefa 8.2): o Cloudflare informa a branch em CF_PAGES_BRANCH. Só a main é produção;
+// qualquer outra branch e o build no PC usam o sandbox. AMBIENTE=producao|sandbox força um dos dois.
+const AMBIENTE = process.env.AMBIENTE ?? (process.env.CF_PAGES_BRANCH === 'main' ? 'producao' : 'sandbox');
+if (AMBIENTE !== 'producao' && AMBIENTE !== 'sandbox') throw new Error(`AMBIENTE inválido: ${AMBIENTE}`);
+// Versão mostrada no rodapé do Início: commit publicado pelo Cloudflare (ou "local").
+const VERSAO = process.env.CF_PAGES_COMMIT_SHA?.slice(0, 7) ?? 'local';
+
 const variaveis = (p: Paleta) =>
   Object.entries(p).map(([k, v]) => `--${k}:${v}`).join(';');
 
@@ -87,6 +94,10 @@ function serviceWorker(): Plugin {
 
 export default defineConfig({
   base: BASE,
+  define: {
+    'import.meta.env.VITE_AMBIENTE': JSON.stringify(AMBIENTE),
+    'import.meta.env.VITE_VERSAO': JSON.stringify(VERSAO),
+  },
   // Um arquivo só (~150 kB comprimido) que fica guardado no celular: o aviso padrão de 500 kB não ajuda.
   build: { chunkSizeWarningLimit: 800 },
   plugins: [react(), marcaNoApp(), serviceWorker()],

@@ -1,5 +1,5 @@
 import { createClient, type AuthError } from '@supabase/supabase-js';
-import { SUPABASE_CHAVE_PUBLICAVEL, SUPABASE_URL } from './config/supabase';
+import { ESQUEMA, SUPABASE_CHAVE_PUBLICAVEL, SUPABASE_URL } from './config/supabase';
 
 // Link de e-mail vencido ou inválido volta com #error=...: lido ANTES do cliente limpar o endereço.
 function lerErroDoLink(): string | null {
@@ -16,6 +16,7 @@ export const erroDoLink = lerErroDoLink();
 // Fluxo "implicit" (padrão): o link do e-mail funciona mesmo aberto em outro navegador do celular.
 export const supabase = createClient(SUPABASE_URL, SUPABASE_CHAVE_PUBLICAVEL, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  db: { schema: ESQUEMA },
 });
 
 // Endereço do app (local ou publicado) para os links dos e-mails; precisa estar nas Redirect URLs.

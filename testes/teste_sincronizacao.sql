@@ -2,7 +2,8 @@
 -- Mesmo esquema do teste_dois_usuarios.sql: usuário de teste sem senha, papel "authenticated",
 -- gravação por "insert ... on conflict do update" (o que a API faz no upsert) e erro proposital no fim
 -- (resultado na mensagem, tudo desfeito). Esperado: "6 OK, 0 FALHOU".
-do $$
+-- Sandbox (tarefa 8.2): rodar de novo trocando "public." por "sandbox." (mesmo resultado esperado).
+do $
 declare
   u  uuid := gen_random_uuid();
   f  uuid := gen_random_uuid();

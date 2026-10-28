@@ -1,8 +1,11 @@
 # Tarefa 1.2, teste 1: visitante (sem login) não lê nem grava nada, pela API pública.
 # Usa só a URL e a chave publicável (as mesmas do app). Rodar: powershell -File testes\teste_visitante.ps1
+# Sandbox (tarefa 8.2): powershell -File testes\teste_visitante.ps1 -Esquema sandbox
+param([ValidateSet('public', 'sandbox')][string]$Esquema = 'public')
 $url   = 'https://ptxlgdbbycqwidpyywam.supabase.co/rest/v1'
 $chave = 'sb_publishable__MZLUObi1t8ojIfzsc8fwA_SKhNwif-'
-$cab   = @{ apikey = $chave; 'Content-Type' = 'application/json'; Prefer = 'return=representation' }
+$cab   = @{ apikey = $chave; 'Content-Type' = 'application/json'; Prefer = 'return=representation'
+           'Accept-Profile' = $Esquema; 'Content-Profile' = $Esquema }
 # Corpo válido por tabela, para a recusa vir da permissão e não de coluna errada.
 $z = '00000000-0000-0000-0000-000000000000'
 $novos = [ordered]@{
@@ -35,4 +38,4 @@ foreach ($t in $tabelas) {
   Tentar 'alterar' $t 'PATCH' '{"atualizado_em":"2026-01-01T00:00:00Z"}'
   Tentar 'apagar ' $t 'DELETE' $null
 }
-if ($falhas) { "RESULTADO: $falhas falha(s)"; exit 1 } else { 'RESULTADO: visitante recusado em tudo (20 de 20)' }
+if ($falhas) { "RESULTADO: $falhas falha(s)"; exit 1 } else { "RESULTADO ($Esquema): visitante recusado em tudo (20 de 20)" }

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { marca } from '../config/marca';
+import { SANDBOX } from '../config/supabase';
 import { abrirBanco, Dados } from './dados';
 import { remotoSupabase } from './remoto';
 import type { EstadoSync, Registros, Remoto, Tabela } from './tipos';
@@ -18,7 +19,7 @@ export function ProvedorDados({ userId, remoto = remotoSupabase, children }: {
   useEffect(() => {
     let d: Dados | null = null;
     let ativo = true;
-    abrirBanco(`${marca.id}-dados-${userId}`).then((db) => {
+    abrirBanco(`${marca.id}${SANDBOX ? '-sandbox' : ''}-dados-${userId}`).then((db) => {
       if (!ativo) { db.close(); return; }
       d = new Dados(db, userId, remoto);
       setDados(d);

@@ -8,6 +8,7 @@ import { IconeFichas, IconeHistorico, IconeInicio } from './icones';
 import Logo from './componentes/Logo';
 import BotaoTema from './componentes/BotaoTema';
 import IndicadorSync from './componentes/IndicadorSync';
+import FaixaSandbox from './componentes/FaixaSandbox';
 import Acesso from './telas/Acesso';
 import Inicio, { ROTA_TREINO } from './telas/Inicio';
 import Treino from './telas/Treino';
@@ -52,6 +53,7 @@ export function Casca({ sessao, remoto }: { sessao: Session; remoto?: Remoto }) 
     <ProvedorDados userId={sessao.user.id} remoto={remoto}>
       <div className="app">
         <header className="topo">
+          <FaixaSandbox />
           <div className="marca">
             <Logo tamanho={28} />
             <span>{marca.nome}</span>

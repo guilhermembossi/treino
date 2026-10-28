@@ -3,6 +3,7 @@ import { marca } from '../config/marca';
 import { enderecoDoApp, erroDoLink, mensagemDeErro, supabase } from '../supabase';
 import Logo from '../componentes/Logo';
 import BotaoTema from '../componentes/BotaoTema';
+import FaixaSandbox from '../componentes/FaixaSandbox';
 
 type Modo = 'entrar' | 'criar' | 'esqueci' | 'nova-senha';
 
@@ -74,6 +75,7 @@ export default function Acesso({ novaSenha = false, aoTrocarSenha }: { novaSenha
 
   return (
     <div className="acesso">
+      <FaixaSandbox />
       <div className="acesso-topo"><BotaoTema /></div>
       <div className="acesso-marca">
         <Logo tamanho={72} />

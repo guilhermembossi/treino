@@ -145,6 +145,22 @@ button { font: inherit; }
 }
 .rodape-conta { margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--textoFraco); }
 .rodape-conta .link { min-height: 0; padding: 0; }
+.versao { font-size: 0.75rem; }
+
+/* Faixa do sandbox (tarefa 8.2): ocupa a linha de cima do topo e do login */
+.topo { flex-wrap: wrap; }
+.faixa-sandbox {
+  flex: 0 0 calc(100% + 2rem);
+  margin: 0 -1rem 0.5rem;
+  padding: 0.2rem 1rem;
+  background: var(--erro);
+  color: var(--sobrePrimaria);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.acesso > .faixa-sandbox { margin: 0 0 1rem; border-radius: 8px; }
 
 .topo-acoes { display: flex; align-items: center; gap: 0.25rem; }
 

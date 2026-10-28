@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { nomeDoUsuario } from '../sessao';
 import { supabase } from '../supabase';
+import { SANDBOX, VERSAO } from '../config/supabase';
 import { useDados, useLista } from '../dados/contexto';
 import { META_SEMANAL, duracaoCurta, proximaFicha, semana, tempoMedio, treinoAberto } from '../dados/treino';
 import type { Ficha } from '../dados/tipos';
@@ -107,6 +108,8 @@ export default function Inicio({ sessao }: { sessao: Session }) {
       <p className="rodape-conta">
         {sessao.user.email} ·{' '}
         <button type="button" className="link" onClick={() => supabase.auth.signOut()}>Sair</button>
+        <br />
+        <span className="versao">versão {VERSAO}{SANDBOX ? ' · sandbox' : ''}</span>
       </p>
     </>
   );

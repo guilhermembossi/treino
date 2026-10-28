@@ -3,7 +3,8 @@
 -- (papel "authenticated" + o id do usuário no token). No fim levanta um erro de propósito:
 -- o resultado sai na mensagem e TUDO é desfeito (nenhum usuário ou dado de teste fica no banco).
 -- Rodar no SQL do Supabase (MCP execute_sql ou SQL Editor).
-do $$
+-- Sandbox (tarefa 8.2): rodar de novo trocando "public." por "sandbox." (mesmo resultado esperado).
+do $
 declare
   u1  uuid := gen_random_uuid();  u2  uuid := gen_random_uuid();
   f1  uuid := gen_random_uuid();  e1  uuid := gen_random_uuid();  s1 uuid := gen_random_uuid();
