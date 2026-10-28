@@ -8,8 +8,8 @@ export const IconeInicio = () => (
   <svg {...props}><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" /><path d="M10 21v-6h4v6" /></svg>
 );
 
-export const IconeHistorico = () => (
-  <svg {...props}><rect x="3" y="4.5" width="18" height="16.5" rx="2" /><path d="M3 9.5h18M8 2.5v4M16 2.5v4" /></svg>
+export const IconeAcompanhamento = () => (
+  <svg {...props}><path d="M4 20V11M10 20V5M16 20v-6M22 20H2" /></svg>
 );
 
 export const IconeFichas = () => (

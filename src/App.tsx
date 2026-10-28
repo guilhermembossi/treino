@@ -4,7 +4,7 @@ import { marca } from './config/marca';
 import { useSessao } from './sessao';
 import { ProvedorDados } from './dados/contexto';
 import type { Remoto } from './dados/tipos';
-import { IconeFichas, IconeHistorico, IconeInicio } from './icones';
+import { IconeAcompanhamento, IconeFichas, IconeInicio } from './icones';
 import Logo from './componentes/Logo';
 import BotaoTema from './componentes/BotaoTema';
 import IndicadorSync from './componentes/IndicadorSync';
@@ -13,18 +13,25 @@ import Acesso from './telas/Acesso';
 import Inicio, { ROTA_TREINO } from './telas/Inicio';
 import Treino from './telas/Treino';
 import ResumoTreino, { ROTA_RESUMO } from './telas/ResumoTreino';
-import Historico from './telas/Historico';
+import Acompanhamento, { ROTA as ROTA_ACOMPANHAMENTO } from './telas/Acompanhamento';
 import Fichas from './telas/Fichas';
 
-type Aba = 'inicio' | 'historico' | 'fichas';
+type Aba = 'inicio' | 'acompanhamento' | 'fichas';
 
-// Navegação pelo # do endereço (#/historico, #/fichas/<id>): funciona no GitHub Pages
+// Navegação pelo # do endereço (#/acompanhamento, #/fichas/<id>): funciona em qualquer hospedagem
 // e o botão voltar do celular volta de tela.
 const ABAS: { id: Aba; rota: string; nome: string; icone: () => ReactNode; tela: (s: Session) => ReactNode }[] = [
   { id: 'inicio', rota: '#/', nome: 'Início', icone: IconeInicio, tela: (s) => <Inicio sessao={s} /> },
-  { id: 'historico', rota: '#/historico', nome: 'Histórico', icone: IconeHistorico, tela: () => <Historico /> },
+  { id: 'acompanhamento', rota: ROTA_ACOMPANHAMENTO, nome: 'Acompanhamento', icone: IconeAcompanhamento, tela: () => <Acompanhamento /> },
   { id: 'fichas', rota: '#/fichas', nome: 'Treinos', icone: IconeFichas, tela: () => <Fichas /> },
 ];
+
+// Endereço antigo (#/historico, até a tarefa 8.5) abre o Acompanhamento, inclusive o detalhe de um treino.
+function corrigirRotaAntiga() {
+  if (location.hash === '#/historico' || location.hash.startsWith('#/historico/')) {
+    history.replaceState(null, '', ROTA_ACOMPANHAMENTO + location.hash.slice('#/historico'.length));
+  }
+}
 
 const abaDoEndereco = (): Aba =>
   ABAS.find((a) => a.id !== 'inicio' && (location.hash === a.rota || location.hash.startsWith(a.rota + '/')))?.id ?? 'inicio';
@@ -38,11 +45,11 @@ export default function App() {
 
 // O app de quem já entrou: topo, tela da aba e barra de baixo.
 export function Casca({ sessao, remoto }: { sessao: Session; remoto?: Remoto }) {
-  const [aba, setAba] = useState<Aba>(abaDoEndereco);
-  const [hash, setHash] = useState(location.hash);
+  const [aba, setAba] = useState<Aba>(() => { corrigirRotaAntiga(); return abaDoEndereco(); });
+  const [hash, setHash] = useState(() => { corrigirRotaAntiga(); return location.hash; });
 
   useEffect(() => {
-    const aoMudar = () => { setAba(abaDoEndereco()); setHash(location.hash); window.scrollTo(0, 0); };
+    const aoMudar = () => { corrigirRotaAntiga(); setAba(abaDoEndereco()); setHash(location.hash); window.scrollTo(0, 0); };
     window.addEventListener('hashchange', aoMudar);
     return () => window.removeEventListener('hashchange', aoMudar);
   }, []);

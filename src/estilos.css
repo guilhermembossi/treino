@@ -521,3 +521,25 @@ button { font: inherit; }
 .link-mais svg { width: 18px; height: 18px; }
 
 :focus-visible { outline: 2px solid var(--primaria); outline-offset: 2px; }
+
+/* Acompanhamento (tarefa 8.5) */
+.segmentado { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; padding: 0.25rem; margin-bottom: 1rem;
+  background: var(--superficie); border: 1px solid var(--borda); border-radius: 12px; }
+.segmentado button { min-height: 40px; border: 0; border-radius: 9px; background: transparent; color: var(--textoFraco);
+  font: inherit; font-weight: 700; touch-action: manipulation; }
+.segmentado button[aria-pressed='true'] { background: var(--primaria); color: var(--sobrePrimaria); }
+.acomp-datas { margin: 0; text-align: center; font-size: 0.8rem; }
+.acomp-meta { margin: 0.75rem 0 0; font-size: 1rem; color: var(--textoFraco); }
+.acomp-meta strong { font-size: 1.6rem; color: var(--texto); }
+.acomp-bateu { color: var(--sucesso); font-weight: 700; }
+.acomp-obs { margin: 0.25rem 0 0; font-size: 0.85rem; }
+.semana-dias li.futuro { opacity: 0.45; }
+.acomp-calendario { margin-top: 0.75rem; }
+.acomp-numeros { margin-top: 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; text-align: center; }
+.acomp-numeros p { margin: 0; }
+.acomp-numeros .rotulo { font-size: 0.7rem; }
+.acomp-valor { font-size: 1.15rem; font-weight: 800; margin-top: 0.25rem !important; }
+.acomp-numeros + .cartao { margin-top: 1rem; }
+.acomp-por-treino { list-style: none; margin: 0.5rem 0 0; padding: 0; }
+.acomp-por-treino li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; border-top: 1px solid var(--borda); }
+.acomp-por-treino li:first-child { border-top: 0; }
