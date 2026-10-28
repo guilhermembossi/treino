@@ -14,6 +14,7 @@ $novos = [ordered]@{
   ficha_series     = "{`"ficha_exercicio_id`":`"$z`",`"serie_n`":1}"
   treinos          = '{"nome_ficha":"x","inicio":"2026-01-01T00:00:00Z"}'
   treino_series    = "{`"treino_id`":`"$z`",`"exercicio_nome`":`"x`",`"serie_n`":1}"
+  videos           = '{"nome":"x","chave":"x","url":"https://youtu.be/x"}'  # tarefa 8.7 (só existe no schema onde a migração já foi aplicada)
 }
 $tabelas = $novos.Keys
 $falhas = 0
@@ -38,4 +39,4 @@ foreach ($t in $tabelas) {
   Tentar 'alterar' $t 'PATCH' '{"atualizado_em":"2026-01-01T00:00:00Z"}'
   Tentar 'apagar ' $t 'DELETE' $null
 }
-if ($falhas) { "RESULTADO: $falhas falha(s)"; exit 1 } else { "RESULTADO ($Esquema): visitante recusado em tudo (20 de 20)" }
+if ($falhas) { "RESULTADO: $falhas falha(s)"; exit 1 } else { "RESULTADO ($Esquema): visitante recusado em tudo (24 de 24)" }

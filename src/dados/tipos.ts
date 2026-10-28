@@ -1,5 +1,5 @@
 // Tabelas do banco (iguais às do Supabase). A ORDEM importa: pais antes dos filhos, para o envio.
-export const TABELAS = ['fichas', 'ficha_exercicios', 'ficha_series', 'treinos', 'treino_series'] as const;
+export const TABELAS = ['fichas', 'ficha_exercicios', 'ficha_series', 'treinos', 'treino_series', 'videos'] as const;
 export type Tabela = (typeof TABELAS)[number];
 
 // Excluir um pai marca os filhos como excluídos também (o banco só apagaria em cascata numa exclusão real).
@@ -33,12 +33,16 @@ export type TreinoSerie = Base & {
   descanso_seg: number | null; feita_em: string | null;
 };
 
+// Biblioteca de vídeos (tarefa 8.7): link do YouTube guardado pelo nome do exercício (`chave` = chaveVideo(nome)).
+export type Video = Base & { nome: string; chave: string; url: string };
+
 export type Registros = {
   fichas: Ficha;
   ficha_exercicios: FichaExercicio;
   ficha_series: FichaSerie;
   treinos: Treino;
   treino_series: TreinoSerie;
+  videos: Video;
 };
 
 // Conversa com o servidor (Supabase de verdade em remoto.ts; falso nos testes).

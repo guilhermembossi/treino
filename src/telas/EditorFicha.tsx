@@ -4,6 +4,7 @@ import { proximaOrdem, renumerar, reordenar } from '../dados/ordem';
 import type { FichaExercicio, FichaSerie } from '../dados/tipos';
 import ListaOrdenavel from '../componentes/ListaOrdenavel';
 import { CampoNumero, CampoTexto } from '../componentes/Campos';
+import { BotaoVideo, CampoVideo } from '../componentes/Video';
 import { IconeMais, IconeVoltar, IconeX } from '../icones';
 
 // Exercício novo já vem com 3 séries de 8–12 reps e 90 s de descanso (o usuário ajusta).
@@ -130,6 +131,7 @@ function CartaoExercicio({ exercicio: e, series, alca, novo }: {
         {alca}
         <CampoTexto className="campo-nome" valor={e.nome} obrigatorio maxLength={100} aria-label="Nome do exercício"
           selecionar={novo} aoSalvar={(nome) => salvar({ nome: nome! })} />
+        <BotaoVideo nome={e.nome} />
         <button type="button" className="botao-icone pequeno" aria-label={`Excluir o exercício ${e.nome}`}
           onClick={() => void excluirExercicio()}><IconeX /></button>
       </div>
@@ -145,6 +147,7 @@ function CartaoExercicio({ exercicio: e, series, alca, novo }: {
         </label>
         <CampoTexto className="campo-obs" valor={e.observacao} maxLength={500} placeholder="Observação (opcional)"
           aria-label={`Observação de ${e.nome}`} aoSalvar={(observacao) => salvar({ observacao })} />
+        <CampoVideo nome={e.nome} />
       </div>
 
       {series.length > 0 && (

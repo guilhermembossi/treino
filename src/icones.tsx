@@ -22,6 +22,10 @@ export const IconeAlca = () => (
   </svg>
 );
 
+export const IconePlay = () => (
+  <svg {...props}><circle cx="12" cy="12" r="9.5" /><path d="m10 8.5 5 3.5-5 3.5z" fill="currentColor" /></svg>
+);
+
 export const IconeSeta = () => (
   <svg {...props}><path d="m9 6 6 6-6 6" /></svg>
 );

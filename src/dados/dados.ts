@@ -16,6 +16,7 @@ interface Esquema extends DBSchema {
   ficha_series: { key: string; value: Registros['ficha_series'] };
   treinos: { key: string; value: Registros['treinos'] };
   treino_series: { key: string; value: Registros['treino_series'] };
+  videos: { key: string; value: Registros['videos'] };
   pendentes: { key: string; value: Pendente }; // registros alterados ainda não enviados
   meta: { key: string; value: Meta };          // até quando já baixou cada tabela
 }
@@ -30,11 +31,12 @@ const ms = (iso: string) => Date.parse(iso);
 const chave = (tabela: Tabela, id: string) => `${tabela}:${id}`;
 
 export async function abrirBanco(nome: string): Promise<Banco> {
-  return openDB<Esquema>(nome, 1, {
+  // Versão 2 (tarefa 8.7): loja `videos`. Cria só o que falta, para quem já tinha o banco da versão 1.
+  return openDB<Esquema>(nome, 2, {
     upgrade(db) {
-      for (const t of TABELAS) db.createObjectStore(t, { keyPath: 'id' });
-      db.createObjectStore('pendentes', { keyPath: 'chave' });
-      db.createObjectStore('meta', { keyPath: 'chave' });
+      for (const t of TABELAS) if (!db.objectStoreNames.contains(t)) db.createObjectStore(t, { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('pendentes')) db.createObjectStore('pendentes', { keyPath: 'chave' });
+      if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta', { keyPath: 'chave' });
     },
   });
 }

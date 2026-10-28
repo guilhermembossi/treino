@@ -479,7 +479,8 @@ button { font: inherit; }
   font-weight: 600;
   text-decoration: none;
 }
-.conteudo input[type='text'] {
+.conteudo input[type='text'],
+.conteudo input[type='url'] {
   min-width: 0;
   font: inherit;
   font-size: 16px; /* evita o zoom do iPhone ao tocar */
@@ -490,7 +491,8 @@ button { font: inherit; }
   background: var(--fundo);
   color: var(--texto);
 }
-.conteudo input[type='text']:focus { outline: 2px solid var(--primaria); outline-offset: 0; border-color: transparent; }
+.conteudo input[type='text']:focus,
+.conteudo input[type='url']:focus { outline: 2px solid var(--primaria); outline-offset: 0; border-color: transparent; }
 .conteudo input::placeholder { color: var(--textoFraco); }
 .campo-titulo { width: 100%; margin: 0.25rem 0 1rem; font-size: 1.4rem !important; font-weight: 800; }
 
@@ -543,3 +545,15 @@ button { font: inherit; }
 .acomp-por-treino { list-style: none; margin: 0.5rem 0 0; padding: 0; }
 .acomp-por-treino li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; border-top: 1px solid var(--borda); }
 .acomp-por-treino li:first-child { border-top: 0; }
+
+/* Vídeos dos exercícios (tarefa 8.7) */
+.campo-video { flex: 1 1 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; }
+.campo-video-linha { flex: 1 1 14rem; display: flex; align-items: center; gap: 0.5rem; }
+.campo-video-linha > span { font-size: 0.85rem; color: var(--textoFraco); }
+.campo-video-linha input { flex: 1; min-width: 0; }
+.campo-video-linha input[aria-invalid='true'] { border-color: var(--erro); }
+.campo-video-busca { font-size: 0.85rem; min-height: 44px; display: inline-flex; align-items: center; }
+.campo-video-aviso { flex: 1 1 100%; margin: 0; font-size: 0.8rem; }
+.botao-video { color: var(--primaria) !important; text-decoration: none; }
+.item-nome .botao-video { display: inline-grid; width: 32px; height: 32px; vertical-align: middle; margin-left: 0.15rem; }
+.campo-video-aviso.erro { color: var(--erro); }

@@ -6,6 +6,7 @@ import {
 import type { FichaExercicio, FichaSerie, TreinoSerie } from '../dados/tipos';
 import { CampoNumero } from '../componentes/Campos';
 import { BarraDescanso, useDescanso } from '../componentes/Descanso';
+import { BotaoVideo } from '../componentes/Video';
 import { IconeCheck, IconeVoltar } from '../icones';
 import { ROTA_RESUMO } from './ResumoTreino';
 
@@ -101,8 +102,8 @@ export default function Treino() {
         {doTreino.map((e) => (
           <li key={e.id} className="cartao exercicio-treino">
             <div className="exercicio-cabeca">
-              <div>
-                <p className="item-nome quebra">{e.nome}</p>
+              <div className="exercicio-cabeca-nome">
+                <p className="item-nome quebra">{e.nome} <BotaoVideo nome={e.nome} /></p>
                 <p className="fraco detalhe-exercicio">Descanso {e.descanso_seg ?? DESCANSO_PADRAO} s</p>
               </div>
               <button type="button" className="botao-descansar" onClick={() => descansar(e)}
