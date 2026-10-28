@@ -7,9 +7,28 @@ const PREFIXO = '__PREFIXO__';
 const ARQUIVOS = __ARQUIVOS__;
 const CACHE = `${PREFIXO}-telas-${VERSAO}`;
 
+// A tela principal fica guardada pelo endereço da pasta ("./"), não por "index.html": o Cloudflare Pages
+// redireciona index.html para a pasta (308), e o navegador recusa abrir o app com uma resposta redirecionada
+// (a tela falhava com ERR_FAILED da segunda abertura em diante; tarefa 8.2).
+const PRINCIPAL = './';
+const enderecoNoCache = (a) => (a === 'index.html' ? PRINCIPAL : a);
+
+// Copia a resposta sem a marca de "redirecionada", por garantia (algum servidor pode redirecionar outro arquivo).
+const semRedirecionamento = async (r) =>
+  r.redirected ? new Response(await r.blob(), { status: r.status, statusText: r.statusText, headers: r.headers }) : r;
+
 // Instala: baixa todas as telas da versão nova e assume na hora.
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARQUIVOS)).then(() => self.skipWaiting()));
+  e.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await Promise.all(ARQUIVOS.map(async (a) => {
+      const endereco = enderecoNoCache(a);
+      const r = await fetch(endereco);
+      if (!r.ok) throw new Error(`${endereco}: HTTP ${r.status}`);
+      await cache.put(endereco, await semRedirecionamento(r));
+    }));
+    await self.skipWaiting();
+  })());
 });
 
 // Ativa: apaga as versões antigas.
@@ -31,7 +50,7 @@ self.addEventListener('fetch', (e) => {
     // ignoreVary: o servidor responde com "Vary" (Origin, Accept-Encoding) e o script do app é pedido
     // com cabeçalhos diferentes dos da instalação; sem isso a busca no cache falha.
     const guardado = pedido.mode === 'navigate'
-      ? await cache.match('index.html', { ignoreVary: true })
+      ? await cache.match(PRINCIPAL, { ignoreVary: true })
       : await cache.match(pedido, { ignoreSearch: true, ignoreVary: true });
     return guardado ?? fetch(pedido);
   })());
